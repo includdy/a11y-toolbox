@@ -1,11 +1,15 @@
 {
-  "name": "a11y-toolbox",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "a11y-toolbox-ts",
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "prestart": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -14,18 +18,21 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/includdy/a11y-toolbox/issues"
   },
   "homepage": "https://github.com/includdy/a11y-toolbox#readme",
   "dependencies": {
+    "@fastify/autoload": "^5.8.0",
     "@fastify/swagger": "^9.5.1",
     "@fastify/swagger-ui": "^5.2.3",
-    "@sinclair/typebox": "^0.34.37",
+    "@sinclair/typebox": "^0.31.20",
     "fastify": "^5.4.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@types/node": "^22.10.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.5.2"
   }
 }
