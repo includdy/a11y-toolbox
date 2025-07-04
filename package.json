@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
+    "postbuild": "mkdir -p dist/scripts && cp src/scripts/tools.js dist/scripts/tools.js",
     "start": "node dist/server.js",
     "prestart": "npm run build"
   },
