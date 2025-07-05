@@ -59,6 +59,12 @@ export const LinksCodeOutSchema = Type.Object({
         accessibleText: Type.String({
             description: 'The accessible text of the element'
         }),
+        pseudoBefore: Type.String({
+            description: 'The content of the ::before pseudo-element, if present'
+        }),
+        pseudoAfter: Type.String({
+            description: 'The content of the ::after pseudo-element, if present'
+        }),
         innerText: Type.String({
             description: 'The text content of the element'
         })

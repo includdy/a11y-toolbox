@@ -160,5 +160,1067 @@
       <span aria-label="Child label">Child text</span>
     </a>
   </section>
+
+  <!-- NEW EDGE CASES FOR nativeTextAlternative() TESTING -->
+  
+  <!-- 21 ─ Button with simple text content -->
+  <!-- Expected: "Click me" (button's text content) -->
+  <section id="case-21">
+    <button id="btn-21">Click me</button>
+  </section>
+
+  <!-- 22 ─ Input with value attribute -->
+  <!-- Expected: "Submit Form" (input's value attribute) -->
+  <section id="case-22">
+    <input id="input-22" type="submit" value="Submit Form">
+  </section>
+
+  <!-- 23 ─ Input with placeholder but no value -->
+  <!-- Expected: "Enter your name" (input's placeholder attribute) -->
+  <section id="case-23">
+    <input id="input-23" type="text" placeholder="Enter your name">
+  </section>
+
+  <!-- 24 ─ Image with alt text -->
+  <!-- Expected: "Profile picture" (img's alt attribute) -->
+  <section id="case-24">
+    <img id="img-24" src="profile.jpg" alt="Profile picture">
+  </section>
+
+  <!-- 25 ─ Image with empty alt (decorative) -->
+  <!-- Expected: "" (empty string for decorative image) -->
+  <section id="case-25">
+    <img id="img-25" src="decoration.jpg" alt="">
+  </section>
+
+  <!-- 26 ─ Image with no alt attribute -->
+  <!-- Expected: "missing.jpg" (filename fallback) -->
+  <section id="case-26">
+    <img id="img-26" src="missing.jpg" role="presentation">
+  </section>
+
+  <!-- 27 ─ Form label associated with input -->
+  <!-- Expected: "Email Address" (associated label's text) -->
+  <section id="case-27">
+    <label for="email-input">Email Address</label>
+    <input id="email-input" type="email">
+  </section>
+
+  <!-- 28 ─ Input wrapped in label -->
+  <!-- Expected: "Password" (wrapping label's text) -->
+  <section id="case-28">
+    <label id="label-28">Password <input type="password"></label>
+  </section>
+
+  <!-- 29 ─ Input with title attribute -->
+  <!-- Expected: "Help tooltip" (input's title attribute) -->
+  <section id="case-29">
+    <input id="input-29" type="text" title="Help tooltip">
+  </section>
+
+  <!-- 30 ─ Link with title attribute -->
+  <!-- Expected: "More information" (link's title attribute when no text content) -->
+  <section id="case-30">
+    <a id="link-30" href="#" title="More information"></a>
+  </section>
+
+  <!-- 31 ─ Link with image inside -->
+  <!-- Expected: "Home icon" (image alt text inside link) -->
+  <section id="case-31">
+    <a id="link-31" href="#"><img alt="Home icon" src="home.png"></a>
+  </section>
+
+  <!-- 32 ─ Link with mixed content -->
+  <!-- Expected: "Go to Home page" (combined text and image alt) -->
+  <section id="case-32">
+    <a id="link-32" href="#">Go to <img alt="Home" src="home.png"> page</a>
+  </section>
+
+  <!-- 33 ─ Button with nested elements -->
+  <!-- Expected: "Save Document" (combined text from nested elements) -->
+  <section id="case-33">
+    <button id="btn-33"><span>Save</span> <em>Document</em></button>
+  </section>
+
+  <!-- 34 ─ Element with pseudo-element content (CSS) -->
+  <!-- Expected: "Before content Main content After content" (includes pseudo-elements) -->
+  <section id="case-34">
+    <style>
+      #pseudo-34::before { content: "Before content "; }
+      #pseudo-34::after { content: " After content"; }
+    </style>
+    <div id="pseudo-34">Main content</div>
+  </section>
+
+  <!-- 35 ─ Select element with options -->
+  <!-- Expected: "Option 1" (first selected option's text) -->
+  <section id="case-35">
+    <select id="select-35">
+      <option selected>Option 1</option>
+      <option>Option 2</option>
+    </select>
+  </section>
+
+  <!-- 36 ─ Textarea with placeholder -->
+  <!-- Expected: "Enter your message" (textarea's placeholder) -->
+  <section id="case-36">
+    <textarea id="textarea-36" placeholder="Enter your message"></textarea>
+  </section>
+
+  <!-- 37 ─ Fieldset with legend -->
+  <!-- Expected: "Personal Information" (fieldset's legend text) -->
+  <section id="case-37">
+    <fieldset id="fieldset-37">
+      <legend>Personal Information</legend>
+      <input type="text" placeholder="Name">
+    </fieldset>
+  </section>
+
+  <!-- 38 ─ Table with caption -->
+  <!-- Expected: "Sales Data" (table's caption text) -->
+  <section id="case-38">
+    <table id="table-38">
+      <caption>Sales Data</caption>
+      <tr><td>Q1</td><td>$1000</td></tr>
+    </table>
+  </section>
+
+  <!-- 39 ─ Figure with figcaption -->
+  <!-- Expected: "Chart showing growth" (figure's figcaption text) -->
+  <section id="case-39">
+    <figure id="figure-39">
+      <img src="chart.png" alt="">
+      <figcaption>Chart showing growth</figcaption>
+    </figure>
+  </section>
+
+  <!-- 40 ─ Element with aria-describedby (should not affect name) -->
+  <!-- Expected: "Main button" (element's own text, describedby doesn't affect name) -->
+  <section id="case-40">
+    <p id="description-40">This button performs the main action</p>
+    <button id="btn-40" aria-describedby="description-40">Main button</button>
+  </section>
+
+  <!-- NEW COMPREHENSIVE ARIA & WCAG COMPLIANCE TESTS -->
+  
+  <!-- 41 ─ Element with aria-hidden="true" (should be ignored) -->
+  <!-- Expected: "" (empty string - element is hidden from accessibility tree) -->
+  <section id="case-41">
+    <div id="hidden-41" aria-hidden="true">Hidden content</div>
+  </section>
+
+  <!-- 42 ─ Element with role="presentation" (should be ignored) -->
+  <!-- Expected: "" (empty string - element has presentation role) -->
+  <section id="case-42">
+    <div id="presentation-42" role="presentation">Presentation content</div>
+  </section>
+
+  <!-- 43 ─ Element with role="none" (should be ignored) -->
+  <!-- Expected: "" (empty string - element has none role) -->
+  <section id="case-43">
+    <div id="none-43" role="none">None role content</div>
+  </section>
+
+  <!-- 44 ─ Input with aria-placeholder -->
+  <!-- Expected: "ARIA placeholder text" (aria-placeholder takes precedence) -->
+  <section id="case-44">
+    <input id="input-44" type="text" placeholder="HTML placeholder" aria-placeholder="ARIA placeholder text">
+  </section>
+
+  <!-- 45 ─ Textarea with aria-placeholder -->
+  <!-- Expected: "ARIA textarea placeholder" (aria-placeholder takes precedence) -->
+  <section id="case-45">
+    <textarea id="textarea-45" placeholder="HTML placeholder" aria-placeholder="ARIA textarea placeholder"></textarea>
+  </section>
+
+  <!-- 46 ─ Range input with aria-valuetext -->
+  <!-- Expected: "50 percent" (aria-valuetext takes precedence) -->
+  <section id="case-46">
+    <input id="range-46" type="range" min="0" max="100" value="50" aria-valuetext="50 percent" aria-valuenow="50">
+  </section>
+
+  <!-- 47 ─ Range input with aria-valuenow only -->
+  <!-- Expected: "75" (aria-valuenow used when no aria-valuetext) -->
+  <section id="case-47">
+    <input id="range-47" type="range" min="0" max="100" value="50" aria-valuenow="75">
+  </section>
+
+  <!-- 48 ─ File input -->
+  <!-- Expected: "Choose file" (default file input text) -->
+  <section id="case-48">
+    <input id="file-48" type="file">
+  </section>
+
+  <!-- 49 ─ File input with value -->
+  <!-- Expected: "document.pdf" (file input with value) -->
+  <section id="case-49">
+    <input id="file-49" type="file" value="document.pdf">
+  </section>
+
+  <!-- 50 ─ Element with role="button" -->
+  <!-- Expected: "Custom button text" (role-based computation) -->
+  <section id="case-50">
+    <div id="role-button-50" role="button">Custom button text</div>
+  </section>
+
+  <!-- 51 ─ Element with role="link" -->
+  <!-- Expected: "Custom link text" (role-based computation) -->
+  <section id="case-51">
+    <div id="role-link-51" role="link">Custom link text</div>
+  </section>
+
+  <!-- 52 ─ Element with role="textbox" and aria-placeholder -->
+  <!-- Expected: "Custom textbox placeholder" (role-based with aria-placeholder) -->
+  <section id="case-52">
+    <div id="role-textbox-52" role="textbox" aria-placeholder="Custom textbox placeholder" aria-label="Custom textbox"></div>
+  </section>
+
+  <!-- 53 ─ Element with role="slider" and aria-valuetext -->
+  <!-- Expected: "Medium volume" (role-based with aria-valuetext) -->
+  <section id="case-53">
+    <div id="role-slider-53" role="slider" aria-valuetext="Medium volume" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" aria-label="Volume slider"></div>
+  </section>
+
+  <!-- 54 ─ Element with role="progressbar" and aria-valuenow -->
+  <!-- Expected: "75" (role-based with aria-valuenow) -->
+  <section id="case-54">
+    <div id="role-progressbar-54" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="Progress indicator"></div>
+  </section>
+
+  <!-- 55 ─ Element with role="img" -->
+  <!-- Expected: "Role-based image" (role-based computation) -->
+  <section id="case-55">
+    <div id="role-img-55" role="img" alt="Role-based image" aria-label="Role-based image"></div>
+  </section>
+
+  <!-- 56 ─ Element with role="heading" -->
+  <!-- Expected: "Custom heading text" (role-based computation) -->
+  <section id="case-56">
+    <div id="role-heading-56" role="heading" aria-level="1">Custom heading text</div>
+  </section>
+
+  <!-- 57 ─ Element with role="group" -->
+  <!-- Expected: "Group content" (role-based computation) -->
+  <section id="case-57">
+    <div id="role-group-57" role="group">Group content</div>
+  </section>
+
+  <!-- 58 ─ Element with role="region" -->
+  <!-- Expected: "Region content" (role-based computation) -->
+  <section id="case-58">
+    <div id="role-region-58" role="region">Region content</div>
+  </section>
+
+  <!-- 59 ─ Image with title but no alt -->
+  <!-- Expected: "Image title text" (fallback to title) -->
+  <section id="case-59">
+    <img id="img-59" src="image.jpg" title="Image title text">
+  </section>
+
+  <!-- 60 ─ Image with filename fallback -->
+  <!-- Expected: "fallback-image.png" (filename fallback) -->
+  <section id="case-60">
+    <img id="img-60" src="/path/to/fallback-image.png?v=123" alt="">
+  </section>
+
+  <!-- 61 ─ Select with option label attribute -->
+  <!-- Expected: "Option Label" (option label attribute) -->
+  <section id="case-61">
+    <select id="select-61">
+      <option selected label="Option Label">Option Text</option>
+    </select>
+  </section>
+
+  <!-- 62 ─ Select with no options but associated label -->
+  <!-- Expected: "Select Label" (associated label fallback) -->
+  <section id="case-62">
+    <label for="select-62">Select Label</label>
+    <select id="select-62"></select>
+  </section>
+
+  <!-- 63 ─ Button with title fallback -->
+  <!-- Expected: "Button tooltip" (title fallback when no content) -->
+  <section id="case-63">
+    <button id="btn-63" title="Button tooltip"></button>
+  </section>
+
+  <!-- 64 ─ Table with summary attribute -->
+  <!-- Expected: "Table summary text" (summary attribute fallback) -->
+  <section id="case-64">
+    <table id="table-64" summary="Table summary text">
+      <tr><td>Data</td></tr>
+    </table>
+  </section>
+
+  <!-- 65 ─ Iframe with title -->
+  <!-- Expected: "Iframe title" (iframe title attribute) -->
+  <section id="case-65">
+    <iframe id="iframe-65" src="about:blank" title="Iframe title"></iframe>
+  </section>
+
+  <!-- 66 ─ Iframe with name attribute -->
+  <!-- Expected: "iframe-name" (iframe name attribute fallback) -->
+  <section id="case-66">
+    <iframe id="iframe-66" src="about:blank" name="iframe-name" title="Test iframe"></iframe>
+  </section>
+
+  <!-- 67 ─ Object with title -->
+  <!-- Expected: "Object title" (object title attribute) -->
+  <section id="case-67">
+    <object id="object-67" data="data.pdf" title="Object title" aria-label="Object title">
+      <p>Object title</p>
+    </object>
+  </section>
+
+  <!-- 68 ─ Object with type information -->
+  <!-- Expected: "application/pdf object" (type-based fallback) -->
+  <section id="case-68">
+    <object id="object-68" data="data.pdf" type="application/pdf"></object>
+  </section>
+
+  <!-- 69 ─ Embed with title -->
+  <!-- Expected: "Embed title" (embed title attribute) -->
+  <section id="case-69">
+    <embed id="embed-69" src="media.swf" title="Embed title">
+  </section>
+
+  <!-- 70 ─ Audio with title -->
+  <!-- Expected: "Audio title" (audio title attribute) -->
+  <section id="case-70">
+    <audio id="audio-70" src="audio.mp3" title="Audio title"></audio>
+  </section>
+
+  <!-- 71 ─ Video with track label -->
+  <!-- Expected: "English Captions" (track label) -->
+  <section id="case-71">
+    <video id="video-71" src="video.mp4">
+      <track kind="captions" label="English Captions" srclang="en">
+    </video>
+  </section>
+
+  <!-- 72 ─ Canvas with fallback content -->
+  <!-- Expected: "Canvas fallback text" (canvas fallback content) -->
+  <section id="case-72">
+    <canvas id="canvas-72">Canvas fallback text</canvas>
+  </section>
+
+  <!-- 73 ─ Canvas with title -->
+  <!-- Expected: "Canvas title" (canvas title attribute) -->
+  <section id="case-73">
+    <canvas id="canvas-73" title="Canvas title"></canvas>
+  </section>
+
+  <!-- 74 ─ SVG with title element -->
+  <!-- Expected: "SVG Title" (SVG title element) -->
+  <section id="case-74">
+    <svg id="svg-74">
+      <title>SVG Title</title>
+      <rect width="100" height="100"/>
+    </svg>
+  </section>
+
+  <!-- 75 ─ SVG with desc element -->
+  <!-- Expected: "SVG Description" (SVG desc element fallback) -->
+  <section id="case-75">
+    <svg id="svg-75">
+      <desc>SVG Description</desc>
+      <rect width="100" height="100"/>
+    </svg>
+  </section>
+
+  <!-- 76 ─ SVG with title attribute -->
+  <!-- Expected: "SVG title attribute" (SVG title attribute fallback) -->
+  <section id="case-76">
+    <svg id="svg-76" title="SVG title attribute">
+      <rect width="100" height="100"/>
+    </svg>
+  </section>
+
+  <!-- 77 ─ MathML with alttext -->
+  <!-- Expected: "Math alternative text" (MathML alttext attribute) -->
+  <section id="case-77">
+    <math id="math-77" alttext="Math alternative text">
+      <mi>x</mi>
+    </math>
+  </section>
+
+  <!-- 78 ─ MathML with title -->
+  <!-- Expected: "Math title" (MathML title attribute) -->
+  <section id="case-78">
+    <math id="math-78" title="Math title">
+      <mi>y</mi>
+    </math>
+  </section>
+
+  <!-- 79 ─ Child element with aria-hidden (should be ignored) -->
+  <!-- Expected: "Visible text" (hidden child ignored) -->
+  <section id="case-79">
+    <div id="parent-79">
+      <span aria-hidden="true">Hidden text</span>
+      <span>Visible text</span>
+    </div>
+  </section>
+
+  <!-- 80 ─ Child SVG with title -->
+  <!-- Expected: "Button with SVG icon" (SVG title contributes to parent) -->
+  <section id="case-80">
+    <button id="btn-80">
+      Button with 
+      <svg><title>SVG icon</title><rect width="10" height="10"/></svg>
+    </button>
+  </section>
+
+  <!-- 81 ─ Child SVG with alt attribute -->
+  <!-- Expected: "Link with SVG alt" (SVG alt contributes to parent) -->
+  <section id="case-81">
+    <a id="link-81" href="#">
+      Link with 
+      <svg alt="SVG alt"><rect width="10" height="10"/></svg>
+    </a>
+  </section>
+
+  <!-- 82 ─ Implicit label with input exclusion -->
+  <!-- Expected: "Username" (input content excluded from label text) -->
+  <section id="case-82">
+    <label id="label-82">
+      Username: <input type="text" value="john@example.com">
+    </label>
+  </section>
+
+  <!-- 83 ─ Complex nested structure with depth limiting -->
+  <!-- Expected: "Level 1 Level 2 Level 3" (limited recursion depth) -->
+  <section id="case-83">
+    <div id="complex-83">
+      <span>Level 1 <span>Level 2 <span>Level 3 <span>Level 4</span></span></span></span>
+    </div>
+  </section>
+
+  <!-- 84 ─ Element with display: contents (should not be ignored) -->
+  <!-- Expected: "Contents display text" (display: contents not ignored) -->
+  <section id="case-84">
+    <style>
+      #contents-84 { display: contents; }
+    </style>
+    <div id="contents-84">Contents display text</div>
+  </section>
+
+  <!-- 85 ─ Role-based computation with unknown role -->
+  <!-- Expected: "Unknown role content" (falls back to default computation) -->
+  <section id="case-85">
+    <div id="unknown-role-85">Unknown role content</div>
+  </section>
+
+  <!-- 86 ─ aria-labelledby with whitespace-only referenced element -->
+  <!-- Expected: "" (empty string - referenced element contains only whitespace) -->
+  <!-- Falls back to: "Link with whitespace reference" (link's own text content) -->
+  <section id="case-86">
+    <span id="whitespace-86">   	
+    </span>
+    <a id="link-86" href="#" aria-labelledby="whitespace-86">Link with whitespace reference</a>
+  </section>
+
+  <!-- 87 ─ aria-labelledby with comment-only referenced element -->
+  <!-- Expected: "" (empty string - comments don't contribute to accessible name) -->
+  <!-- Falls back to: "Link with comment reference" (link's own text content) -->
+  <section id="case-87">
+    <span id="comment-87"><!-- This is just a comment --></span>
+    <a id="link-87" href="#" aria-labelledby="comment-87">Link with comment reference</a>
+  </section>
+
+  <!-- 88 ─ aria-labelledby with deeply nested aria-hidden content -->
+  <!-- Expected: "Visible nested content" (aria-hidden children ignored) -->
+  <section id="case-88">
+    <div id="nested-hidden-88">
+      <span aria-hidden="true">Hidden <span>deeply nested</span> content</span>
+      <span>Visible <span>nested</span> content</span>
+    </div>
+    <a id="link-88" href="#" aria-labelledby="nested-hidden-88">Link text</a>
+  </section>
+
+  <!-- 89 ─ aria-labelledby with pseudo-element content -->
+  <!-- Expected: "Before Main After" (pseudo-elements should be included) -->
+  <section id="case-89">
+    <style>
+      #pseudo-ref-89::before { content: "Before "; }
+      #pseudo-ref-89::after { content: " After"; }
+    </style>
+    <span id="pseudo-ref-89">Main</span>
+    <a id="link-89" href="#" aria-labelledby="pseudo-ref-89">Link text</a>
+  </section>
+
+  <!-- 90 ─ aria-labelledby with CSS content property -->
+  <!-- Expected: "CSS Generated Content" (CSS content should be included) -->
+  <section id="case-90">
+    <style>
+      #css-content-90::before { content: "CSS Generated "; }
+      #css-content-90::after { content: " Content"; }
+    </style>
+    <span id="css-content-90"></span>
+    <a id="link-90" href="#" aria-labelledby="css-content-90">Link text</a>
+  </section>
+
+  <!-- 91 ─ aria-labelledby with form control values -->
+  <!-- Expected: "user@example.com" (form control value should be included) -->
+  <section id="case-91">
+    <input id="email-91" type="email" value="user@example.com">
+    <button id="btn-91" aria-labelledby="email-91">Submit</button>
+  </section>
+
+  <!-- 92 ─ aria-labelledby with contenteditable text -->
+  <!-- Expected: "Editable content text" (contenteditable text should be included) -->
+  <section id="case-92">
+    <div id="editable-92" contenteditable="true">Editable content text</div>
+    <button id="btn-92" aria-labelledby="editable-92">Action</button>
+  </section>
+
+  <!-- 93 ─ aria-labelledby with slot content (Web Components) -->
+  <!-- Expected: "Slotted content" (slot content should be included) -->
+  <section id="case-93">
+    <div id="slot-container-93">
+      <slot name="label-slot">Slotted content</slot>
+    </div>
+    <button id="btn-93" aria-labelledby="slot-container-93">Action</button>
+  </section>
+
+  <!-- 94 ─ aria-labelledby with shadow DOM content -->
+  <!-- Expected: "Shadow content" (shadow DOM content handling) -->
+  <section id="case-94">
+    <div id="shadow-host-94">Shadow content</div>
+    <button id="btn-94" aria-labelledby="shadow-host-94">Action</button>
+  </section>
+
+  <!-- 95 ─ aria-labelledby with iframe content -->
+  <!-- Expected: "" (iframe content should not be accessible) -->
+  <!-- Falls back to: "Iframe button" (button's own text content) -->
+  <section id="case-95">
+    <iframe id="iframe-ref-95" src="data:text/html,<span id='iframe-text'>Iframe content</span>" title="Test iframe for accessibility"></iframe>
+    <button id="btn-95" aria-labelledby="iframe-ref-95">Iframe button</button>
+  </section>
+
+  <!-- 96 ─ aria-labelledby with script-generated content -->
+  <!-- Expected: "Generated content" (script-generated content should be included) -->
+  <section id="case-96">
+    <span id="script-gen-96"></span>
+    <script>
+      document.getElementById('script-gen-96').textContent = 'Generated content';
+    </script>
+    <button id="btn-96" aria-labelledby="script-gen-96">Action</button>
+  </section>
+
+  <!-- 97 ─ aria-labelledby with multiple whitespace types -->
+  <!-- Expected: "Word1 Word2 Word3" (various whitespace normalized to single spaces) -->
+  <section id="case-97">
+    <span id="multi-space-97">Word1	Word2
+    Word3</span>
+    <button id="btn-97" aria-labelledby="multi-space-97">Action</button>
+  </section>
+
+  <!-- 98 ─ aria-labelledby with zero-width characters -->
+  <!-- Expected: "Zero​Width​Test" (zero-width characters should be preserved or handled) -->
+  <section id="case-98">
+    <span id="zero-width-98">Zero​Width​Test</span>
+    <button id="btn-98" aria-labelledby="zero-width-98">Action</button>
+  </section>
+
+  <!-- 99 ─ aria-labelledby with RTL text -->
+  <!-- Expected: "نص عربي" (RTL text should be preserved) -->
+  <section id="case-99">
+    <span id="rtl-99" dir="rtl">نص عربي</span>
+    <button id="btn-99" aria-labelledby="rtl-99">Action</button>
+  </section>
+
+  <!-- 100 ─ aria-labelledby with mixed LTR/RTL text -->
+  <!-- Expected: "English نص عربي Text" (mixed directionality text) -->
+  <section id="case-100">
+    <span id="mixed-dir-100">English <span dir="rtl">نص عربي</span> Text</span>
+    <button id="btn-100" aria-labelledby="mixed-dir-100">Action</button>
+  </section>
+
+  <!-- 101 ─ aria-labelledby with ARIA live region -->
+  <!-- Expected: "Live content" (live region content should be included) -->
+  <section id="case-101">
+    <div id="live-101" aria-live="polite">Live content</div>
+    <button id="btn-101" aria-labelledby="live-101">Action</button>
+  </section>
+
+  <!-- 102 ─ aria-labelledby with role="alert" -->
+  <!-- Expected: "Alert message" (alert content should be included) -->
+  <section id="case-102">
+    <div id="alert-102" role="alert">Alert message</div>
+    <button id="btn-102" aria-labelledby="alert-102">Action</button>
+  </section>
+
+  <!-- 103 ─ aria-labelledby with role="status" -->
+  <!-- Expected: "Status message" (status content should be included) -->
+  <section id="case-103">
+    <div id="status-103" role="status">Status message</div>
+    <button id="btn-103" aria-labelledby="status-103">Action</button>
+  </section>
+
+  <!-- 104 ─ aria-labelledby with role="log" -->
+  <!-- Expected: "Log entry" (log content should be included) -->
+  <section id="case-104">
+    <div id="log-104" role="log">Log entry</div>
+    <button id="btn-104" aria-labelledby="log-104">Action</button>
+  </section>
+
+  <!-- 105 ─ aria-labelledby with role="marquee" -->
+  <!-- Expected: "Marquee text" (marquee content should be included) -->
+  <section id="case-105">
+    <div id="marquee-105" role="marquee">Marquee text</div>
+    <button id="btn-105" aria-labelledby="marquee-105">Action</button>
+  </section>
+
+  <!-- 106 ─ aria-labelledby with role="timer" -->
+  <!-- Expected: "00:30" (timer content should be included) -->
+  <section id="case-106">
+    <div id="timer-106" role="timer">00:30</div>
+    <button id="btn-106" aria-labelledby="timer-106">Action</button>
+  </section>
+
+  <!-- 107 ─ aria-labelledby with ARIA atomic region -->
+  <!-- Expected: "Atomic content" (atomic region content should be included) -->
+  <section id="case-107">
+    <div id="atomic-107" aria-atomic="true">Atomic content</div>
+    <button id="btn-107" aria-labelledby="atomic-107">Action</button>
+  </section>
+
+  <!-- 108 ─ aria-labelledby with ARIA relevant changes -->
+  <!-- Expected: "Relevant content" (relevant content should be included) -->
+  <section id="case-108">
+    <div id="relevant-108" aria-live="polite" aria-relevant="additions text">Relevant content</div>
+    <button id="btn-108" aria-labelledby="relevant-108">Action</button>
+  </section>
+
+  <!-- 109 ─ aria-labelledby with ARIA busy state -->
+  <!-- Expected: "Busy content" (busy state should not affect name computation) -->
+  <section id="case-109">
+    <div id="busy-109" aria-busy="true">Busy content</div>
+    <button id="btn-109" aria-labelledby="busy-109">Action</button>
+  </section>
+
+  <!-- 110 ─ aria-labelledby with ARIA invalid state -->
+  <!-- Expected: "Invalid content" (invalid state should not affect name computation) -->
+  <section id="case-110">
+    <div id="invalid-110" aria-invalid="true">Invalid content</div>
+    <button id="btn-110" aria-labelledby="invalid-110">Action</button>
+  </section>
+
+  <!-- 111 ─ aria-labelledby with ARIA expanded state -->
+  <!-- Expected: "Expanded content" (expanded state should not affect name computation) -->
+  <section id="case-111">
+    <div id="expanded-111" aria-expanded="true">Expanded content</div>
+    <button id="btn-111" aria-labelledby="expanded-111">Action</button>
+  </section>
+
+  <!-- 112 ─ aria-labelledby with ARIA pressed state -->
+  <!-- Expected: "Pressed content" (pressed state should not affect name computation) -->
+  <section id="case-112">
+    <div id="pressed-112" aria-pressed="true">Pressed content</div>
+    <button id="btn-112" aria-labelledby="pressed-112">Action</button>
+  </section>
+
+  <!-- 113 ─ aria-labelledby with ARIA selected state -->
+  <!-- Expected: "Selected content" (selected state should not affect name computation) -->
+  <section id="case-113">
+    <div id="selected-113" aria-selected="true">Selected content</div>
+    <button id="btn-113" aria-labelledby="selected-113">Action</button>
+  </section>
+
+  <!-- 114 ─ aria-labelledby with ARIA checked state -->
+  <!-- Expected: "Checked content" (checked state should not affect name computation) -->
+  <section id="case-114">
+    <div id="checked-114" aria-checked="true">Checked content</div>
+    <button id="btn-114" aria-labelledby="checked-114">Action</button>
+  </section>
+
+  <!-- 115 ─ aria-labelledby with ARIA disabled state -->
+  <!-- Expected: "Disabled content" (disabled state should not affect name computation) -->
+  <section id="case-115">
+    <div id="disabled-115" aria-disabled="true">Disabled content</div>
+    <button id="btn-115" aria-labelledby="disabled-115">Action</button>
+  </section>
+
+  <!-- 116 ─ aria-labelledby with ARIA readonly state -->
+  <!-- Expected: "Readonly content" (readonly state should not affect name computation) -->
+  <section id="case-116">
+    <div id="readonly-116" aria-readonly="true">Readonly content</div>
+    <button id="btn-116" aria-labelledby="readonly-116">Action</button>
+  </section>
+
+  <!-- 117 ─ aria-labelledby with ARIA required state -->
+  <!-- Expected: "Required content" (required state should not affect name computation) -->
+  <section id="case-117">
+    <div id="required-117" aria-required="true">Required content</div>
+    <button id="btn-117" aria-labelledby="required-117">Action</button>
+  </section>
+
+  <!-- 118 ─ aria-labelledby with ARIA multiline state -->
+  <!-- Expected: "Multiline content" (multiline state should not affect name computation) -->
+  <section id="case-118">
+    <div id="multiline-118" aria-multiline="true">Multiline content</div>
+    <button id="btn-118" aria-labelledby="multiline-118">Action</button>
+  </section>
+
+  <!-- 119 ─ aria-labelledby with ARIA autocomplete -->
+  <!-- Expected: "Autocomplete content" (autocomplete should not affect name computation) -->
+  <section id="case-119">
+    <input id="autocomplete-119" aria-autocomplete="list" value="Autocomplete content">
+    <button id="btn-119" aria-labelledby="autocomplete-119">Action</button>
+  </section>
+
+  <!-- 120 ─ aria-labelledby with ARIA haspopup -->
+  <!-- Expected: "Popup content" (haspopup should not affect name computation) -->
+  <section id="case-120">
+    <div id="popup-120" aria-haspopup="true">Popup content</div>
+    <button id="btn-120" aria-labelledby="popup-120">Action</button>
+  </section>
+
+  <!-- 121 ─ aria-labelledby with ARIA level -->
+  <!-- Expected: "Level content" (level should not affect name computation) -->
+  <section id="case-121">
+    <div id="level-121" aria-level="2">Level content</div>
+    <button id="btn-121" aria-labelledby="level-121">Action</button>
+  </section>
+
+  <!-- 122 ─ aria-labelledby with ARIA posinset -->
+  <!-- Expected: "Position content" (posinset should not affect name computation) -->
+  <section id="case-122">
+    <div id="posinset-122" aria-posinset="3">Position content</div>
+    <button id="btn-122" aria-labelledby="posinset-122">Action</button>
+  </section>
+
+  <!-- 123 ─ aria-labelledby with ARIA setsize -->
+  <!-- Expected: "Setsize content" (setsize should not affect name computation) -->
+  <section id="case-123">
+    <div id="setsize-123" aria-setsize="10">Setsize content</div>
+    <button id="btn-123" aria-labelledby="setsize-123">Action</button>
+  </section>
+
+  <!-- 124 ─ aria-labelledby with ARIA orientation -->
+  <!-- Expected: "Orientation content" (orientation should not affect name computation) -->
+  <section id="case-124">
+    <div id="orientation-124" role="slider" aria-orientation="horizontal" aria-label="Orientation content">Orientation content</div>
+    <button id="btn-124" aria-labelledby="orientation-124">Action</button>
+  </section>
+
+  <!-- 125 ─ aria-labelledby with ARIA sort -->
+  <!-- Expected: "Sort content" (sort should not affect name computation) -->
+  <section id="case-125">
+    <div id="sort-125" role="columnheader" aria-sort="ascending">Sort content</div>
+    <button id="btn-125" aria-labelledby="sort-125">Action</button>
+  </section>
+
+  <!-- 126 ─ aria-labelledby with ARIA dropeffect -->
+  <!-- Expected: "Drop content" (dropeffect should not affect name computation) -->
+  <section id="case-126">
+    <div id="drop-126">Drop content</div>
+    <button id="btn-126" aria-labelledby="drop-126">Action</button>
+  </section>
+
+  <!-- 127 ─ aria-labelledby with ARIA grabbed -->
+  <!-- Expected: "Grabbed content" (grabbed should not affect name computation) -->
+  <section id="case-127">
+    <div id="grabbed-127">Grabbed content</div>
+    <button id="btn-127" aria-labelledby="grabbed-127">Action</button>
+  </section>
+
+  <!-- 128 ─ aria-labelledby with CSS visibility:hidden (should be ignored) -->
+  <!-- Expected: "" (empty string - visibility:hidden elements should be ignored) -->
+  <!-- Falls back to: "Invisible reference button" (button's own text content) -->
+  <section id="case-128">
+    <style>
+      #invisible-128 { visibility: hidden; }
+    </style>
+    <span id="invisible-128">Invisible content</span>
+    <button id="btn-128" aria-labelledby="invisible-128">Invisible reference button</button>
+  </section>
+
+  <!-- 129 ─ aria-labelledby with CSS opacity:0 (should be included) -->
+  <!-- Expected: "Transparent content" (opacity:0 elements should still be included) -->
+  <section id="case-129">
+    <style>
+      #transparent-129 { opacity: 0; }
+    </style>
+    <span id="transparent-129">Transparent content</span>
+    <button id="btn-129" aria-labelledby="transparent-129">Action</button>
+  </section>
+
+  <!-- 130 ─ aria-labelledby with CSS transform:scale(0) (should be included) -->
+  <!-- Expected: "Scaled content" (scaled elements should still be included) -->
+  <section id="case-130">
+    <style>
+      #scaled-130 { transform: scale(0); }
+    </style>
+    <span id="scaled-130">Scaled content</span>
+    <button id="btn-130" aria-labelledby="scaled-130">Action</button>
+  </section>
+
+  <!-- 131 ─ aria-labelledby with CSS position:absolute off-screen (should be included) -->
+  <!-- Expected: "Offscreen content" (off-screen elements should still be included) -->
+  <section id="case-131">
+    <style>
+      #offscreen-131 { position: absolute; left: -9999px; }
+    </style>
+    <span id="offscreen-131">Offscreen content</span>
+    <button id="btn-131" aria-labelledby="offscreen-131">Action</button>
+  </section>
+
+  <!-- 132 ─ aria-labelledby with CSS clip:rect(0,0,0,0) (should be included) -->
+  <!-- Expected: "Clipped content" (clipped elements should still be included) -->
+  <section id="case-132">
+    <style>
+      #clipped-132 { position: absolute; clip: rect(0,0,0,0); }
+    </style>
+    <span id="clipped-132">Clipped content</span>
+    <button id="btn-132" aria-labelledby="clipped-132">Action</button>
+  </section>
+
+  <!-- 133 ─ aria-labelledby with CSS clip-path:inset(100%) (should be included) -->
+  <!-- Expected: "Clip-path content" (clip-path elements should still be included) -->
+  <section id="case-133">
+    <style>
+      #clippath-133 { clip-path: inset(100%); }
+    </style>
+    <span id="clippath-133">Clip-path content</span>
+    <button id="btn-133" aria-labelledby="clippath-133">Action</button>
+  </section>
+
+  <!-- 134 ─ aria-labelledby with CSS overflow:hidden and negative margin (should be included) -->
+  <!-- Expected: "Hidden overflow content" (overflow:hidden elements should still be included) -->
+  <section id="case-134">
+    <style>
+      #overflow-container-134 { overflow: hidden; width: 1px; height: 1px; }
+      #overflow-134 { margin-left: -100px; }
+    </style>
+    <div id="overflow-container-134">
+      <span id="overflow-134">Hidden overflow content</span>
+    </div>
+    <button id="btn-134" aria-labelledby="overflow-134">Action</button>
+  </section>
+
+  <!-- 135 ─ aria-labelledby with CSS max-width:0 (should be included) -->
+  <!-- Expected: "Zero width content" (zero-width elements should still be included) -->
+  <section id="case-135">
+    <style>
+      #zerowidth-135 { max-width: 0; overflow: hidden; }
+    </style>
+    <span id="zerowidth-135">Zero width content</span>
+    <button id="btn-135" aria-labelledby="zerowidth-135">Action</button>
+  </section>
+
+  <!-- 136 ─ aria-labelledby with CSS max-height:0 (should be included) -->
+  <!-- Expected: "Zero height content" (zero-height elements should still be included) -->
+  <section id="case-136">
+    <style>
+      #zeroheight-136 { max-height: 0; overflow: hidden; }
+    </style>
+    <span id="zeroheight-136">Zero height content</span>
+    <button id="btn-136" aria-labelledby="zeroheight-136">Action</button>
+  </section>
+
+  <!-- 137 ─ aria-labelledby with CSS text-indent:-9999px (should be included) -->
+  <!-- Expected: "Indented content" (text-indent elements should still be included) -->
+  <section id="case-137">
+    <style>
+      #indented-137 { text-indent: -9999px; }
+    </style>
+    <span id="indented-137">Indented content</span>
+    <button id="btn-137" aria-labelledby="indented-137">Action</button>
+  </section>
+
+  <!-- 138 ─ aria-labelledby with CSS font-size:0 (should be included) -->
+  <!-- Expected: "Zero font content" (zero font-size elements should still be included) -->
+  <section id="case-138">
+    <style>
+      #zerofont-138 { font-size: 0; }
+    </style>
+    <span id="zerofont-138">Zero font content</span>
+    <button id="btn-138" aria-labelledby="zerofont-138">Action</button>
+  </section>
+
+  <!-- 139 ─ aria-labelledby with CSS color:transparent (should be included) -->
+  <!-- Expected: "Transparent text content" (transparent text should still be included) -->
+  <section id="case-139">
+    <style>
+      #transparent-text-139 { color: transparent; }
+    </style>
+    <span id="transparent-text-139">Transparent text content</span>
+    <button id="btn-139" aria-labelledby="transparent-text-139">Action</button>
+  </section>
+
+  <!-- 140 ─ aria-labelledby with CSS background-color matching text color (should be included) -->
+  <!-- Expected: "Invisible text content" (invisible text should still be included) -->
+  <section id="case-140">
+    <style>
+      #invisible-text-140 { color: white; background-color: white; }
+    </style>
+    <span id="invisible-text-140">Invisible text content</span>
+    <button id="btn-140" aria-labelledby="invisible-text-140">Action</button>
+  </section>
+
+  <!-- 141 ─ Complex circular reference with multiple levels -->
+  <!-- Expected: "Level 1 text" (first level before circular reference is detected) -->
+  <section id="case-141">
+    <div id="circ-a-141" aria-labelledby="circ-b-141">Level 1 text</div>
+    <div id="circ-b-141" aria-labelledby="circ-c-141">Level 2 text</div>
+    <div id="circ-c-141" aria-labelledby="circ-a-141">Level 3 text</div>
+    <button id="btn-141" aria-labelledby="circ-a-141">Action</button>
+  </section>
+
+  <!-- 142 ─ aria-labelledby with dynamically changing content -->
+  <!-- Expected: "Dynamic content" (content that changes after page load) -->
+  <section id="case-142">
+    <span id="dynamic-142">Initial content</span>
+    <script>
+      setTimeout(() => {
+        document.getElementById('dynamic-142').textContent = 'Dynamic content';
+      }, 100);
+    </script>
+    <button id="btn-142" aria-labelledby="dynamic-142">Action</button>
+  </section>
+
+  <!-- 143 ─ aria-labelledby with MutationObserver target -->
+  <!-- Expected: "Observed content" (content that changes via MutationObserver) -->
+  <section id="case-143">
+    <span id="observed-143">Original content</span>
+    <script>
+      const observer = new MutationObserver(() => {
+        // Content changed
+      });
+      observer.observe(document.getElementById('observed-143'), { childList: true, subtree: true });
+      setTimeout(() => {
+        document.getElementById('observed-143').textContent = 'Observed content';
+      }, 200);
+    </script>
+    <button id="btn-143" aria-labelledby="observed-143">Action</button>
+  </section>
+
+  <!-- 144 ─ aria-labelledby with Web Component custom element -->
+  <!-- Expected: "Custom element content" (custom element content should be included) -->
+  <section id="case-144">
+    <custom-element id="custom-144">Custom element content</custom-element>
+    <button id="btn-144" aria-labelledby="custom-144">Action</button>
+  </section>
+
+  <!-- 145 ─ aria-labelledby with autonomous custom element -->
+  <!-- Expected: "Autonomous content" (autonomous custom element content should be included) -->
+  <section id="case-145">
+    <my-autonomous-element id="autonomous-145">Autonomous content</my-autonomous-element>
+    <button id="btn-145" aria-labelledby="autonomous-145">Action</button>
+  </section>
+
+  <!-- 146 ─ aria-labelledby with customized built-in element -->
+  <!-- Expected: "Customized content" (customized built-in element content should be included) -->
+  <section id="case-146">
+    <div is="my-custom-div" id="customized-146">Customized content</div>
+    <button id="btn-146" aria-labelledby="customized-146">Action</button>
+  </section>
+
+  <!-- 147 ─ aria-labelledby with element in different document -->
+  <!-- Expected: "" (empty string - elements in different documents should not be accessible) -->
+  <!-- Falls back to: "Cross-document button" (button's own text content) -->
+  <section id="case-147">
+    <iframe id="other-doc-147" src="data:text/html,<span id='cross-doc-span'>Cross-document content</span>"></iframe>
+    <button id="btn-147" aria-labelledby="cross-doc-span">Cross-document button</button>
+  </section>
+
+  <!-- 148 ─ aria-labelledby with element in same-origin iframe -->
+  <!-- Expected: "" (empty string - iframe content should not be accessible even if same-origin) -->
+  <!-- Falls back to: "Same-origin iframe button" (button's own text content) -->
+  <section id="case-148">
+    <iframe id="same-origin-147" src="about:blank" title="Same-origin test iframe"></iframe>
+    <script>
+      const iframe = document.getElementById('same-origin-147');
+      iframe.onload = () => {
+        iframe.contentDocument.body.innerHTML = '<span id="iframe-span">Same-origin iframe content</span>';
+      };
+    </script>
+    <button id="btn-148" aria-labelledby="iframe-span">Same-origin iframe button</button>
+  </section>
+
+  <!-- 149 ─ aria-labelledby with XML namespace elements -->
+  <!-- Expected: "XML content" (XML namespace elements should be included) -->
+  <section id="case-149">
+    <xml:element id="xml-149" xmlns:xml="http://www.w3.org/XML/1998/namespace">XML content</xml:element>
+    <button id="btn-149" aria-labelledby="xml-149">Action</button>
+  </section>
+
+  <!-- 150 ─ aria-labelledby with XHTML namespace elements -->
+  <!-- Expected: "XHTML content" (XHTML namespace elements should be included) -->
+  <section id="case-150">
+    <xhtml:span id="xhtml-150" xmlns:xhtml="http://www.w3.org/1999/xhtml">XHTML content</xhtml:span>
+    <button id="btn-150" aria-labelledby="xhtml-150">Action</button>
+  </section>
+
+  <!-- 151 ─ aria-labelledby with element containing only emoji -->
+  <!-- Expected: "🚀🎉✨" (emoji should be preserved) -->
+  <section id="case-151">
+    <span id="emoji-151">🚀🎉✨</span>
+    <button id="btn-151" aria-labelledby="emoji-151">Action</button>
+  </section>
+
+  <!-- 152 ─ aria-labelledby with element containing mixed scripts -->
+  <!-- Expected: "Hello 世界 مرحبا" (mixed scripts should be preserved) -->
+  <section id="case-152">
+    <span id="mixed-scripts-152">Hello 世界 مرحبا</span>
+    <button id="btn-152" aria-labelledby="mixed-scripts-152">Action</button>
+  </section>
+
+  <!-- 153 ─ aria-labelledby with element containing control characters -->
+  <!-- Expected: "Control test" (control characters should be handled appropriately) -->
+  <section id="case-153">
+    <span id="control-153">Control test</span>
+    <button id="btn-153" aria-labelledby="control-153">Action</button>
+  </section>
+
+  <!-- 154 ─ aria-labelledby with element containing ZWSP (Zero Width Space) -->
+  <!-- Expected: "Zero​Width​Space" (ZWSP should be preserved or handled correctly) -->
+  <section id="case-154">
+    <span id="zwsp-154">Zero​Width​Space</span>
+    <button id="btn-154" aria-labelledby="zwsp-154">Action</button>
+  </section>
+
+  <!-- 155 ─ aria-labelledby with element containing soft hyphen -->
+  <!-- Expected: "Soft­hyphen­test" (soft hyphens should be handled correctly) -->
+  <section id="case-155">
+    <span id="softhyphen-155">Soft­hyphen­test</span>
+    <button id="btn-155" aria-labelledby="softhyphen-155">Action</button>
+  </section>
+
+  <!-- 156 ─ aria-labelledby with element containing word joiner -->
+  <!-- Expected: "Word⁠joiner⁠test" (word joiners should be handled correctly) -->
+  <section id="case-156">
+    <span id="wordjoiner-156">Word⁠joiner⁠test</span>
+    <button id="btn-156" aria-labelledby="wordjoiner-156">Action</button>
+  </section>
+
+  <!-- 157 ─ aria-labelledby with element containing directional marks -->
+  <!-- Expected: "LTR‎RTL‏test" (directional marks should be handled correctly) -->
+  <section id="case-157">
+    <span id="directional-157">LTR‎RTL‏test</span>
+    <button id="btn-157" aria-labelledby="directional-157">Action</button>
+  </section>
+
+  <!-- 158 ─ aria-labelledby with element containing variation selectors -->
+  <!-- Expected: "Variation︎test" (variation selectors should be handled correctly) -->
+  <section id="case-158">
+    <span id="variation-158">Variation︎test</span>
+    <button id="btn-158" aria-labelledby="variation-158">Action</button>
+  </section>
+
+  <!-- 159 ─ aria-labelledby with element containing combining characters -->
+  <!-- Expected: "Combininĝtest" (combining characters should be handled correctly) -->
+  <section id="case-159">
+    <span id="combining-159">Combininĝtest</span>
+    <button id="btn-159" aria-labelledby="combining-159">Action</button>
+  </section>
+
+  <!-- 160 ─ aria-labelledby with element containing surrogate pairs -->
+  <!-- Expected: "𝕊𝕦𝕣𝕣𝕠𝕘𝕒𝕥𝕖" (surrogate pairs should be handled correctly) -->
+  <section id="case-160">
+    <span id="surrogate-160">𝕊𝕦𝕣𝕣𝕠𝕘𝕒𝕥𝕖</span>
+    <button id="btn-160" aria-labelledby="surrogate-160">Action</button>
+  </section>
 </body>
 </html>
