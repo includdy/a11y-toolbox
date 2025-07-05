@@ -9,9 +9,36 @@
  * and provides consistent, reliable analysis results.
  */
 
-// @ts-ignore
-import { tokenizeHTML } from '../../../scripts/tools.js';
 import { AnalyzeCodeOut } from './analyze.schema.js';
+
+/**
+ * Simple HTML tokenizer function
+ * @param htmlString - The HTML string to tokenize
+ * @returns Array of tokens
+ */
+function tokenizeHTML(htmlString: string): string[] {
+    // Simple tokenization - extract text content and tag names
+    const tokens: string[] = [];
+    
+    // Remove HTML tags and extract text content
+    const textContent = htmlString.replace(/<[^>]*>/g, ' ').trim();
+    if (textContent) {
+        tokens.push(...textContent.split(/\s+/).filter(token => token.length > 0));
+    }
+    
+    // Extract tag names
+    const tagMatches = htmlString.match(/<\/?([a-zA-Z][a-zA-Z0-9]*)/g);
+    if (tagMatches) {
+        tagMatches.forEach(match => {
+            const tagName = match.replace(/[<>/]/g, '');
+            if (tagName) {
+                tokens.push(tagName);
+            }
+        });
+    }
+    
+    return tokens;
+}
 
 /**
  * Analyzes a code snippet and returns comprehensive metrics
@@ -29,16 +56,16 @@ import { AnalyzeCodeOut } from './analyze.schema.js';
  * 
  * @example
  * ```typescript
- * const result = analyzeSnippet('function hello() {\n  return "Hello, World!";\n}');
+ * const result = await analyzeSnippet('function hello() {\n  return "Hello, World!";\n}');
  * // Returns: { lines: 3, chars: 47, is_empty: false }
  * 
- * const emptyResult = analyzeSnippet('   \n  \n  ');
+ * const emptyResult = await analyzeSnippet('   \n  \n  ');
  * // Returns: { lines: 3, chars: 7, is_empty: true }
  * ```
  * 
  * @throws {Error} If the code parameter is not a string
  */
-export function analyzeSnippet(code: string): AnalyzeCodeOut {
+export async function analyzeSnippet(code: string): Promise<AnalyzeCodeOut> {
   // Input validation
   if (typeof code !== 'string') {
     throw new Error('Code parameter must be a string');

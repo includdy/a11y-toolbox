@@ -34,10 +34,23 @@ export default async function routes(app: FastifyInstance) {
    * This endpoint accepts any programming language or text content
    * and provides quick analysis for code snippets up to 100KB.
    * 
-   * @example Request
+   * Accepts both JSON and raw code:
+   * - JSON: {"code": "function() {...}"}
+   * - Raw code: Content-Type: text/plain or text/html with code in body
+   * 
+   * @example Request (JSON)
    * ```json
    * {
    *   "code": "function fibonacci(n) {\n  return n <= 1 ? n : fibonacci(n-1) + fibonacci(n-2);\n}"
+   * }
+   * ```
+   * 
+   * @example Request (Raw Code)
+   * ```
+   * Content-Type: text/plain
+   * 
+   * function fibonacci(n) {
+   *   return n <= 1 ? n : fibonacci(n-1) + fibonacci(n-2);
    * }
    * ```
    * 
@@ -50,7 +63,7 @@ export default async function routes(app: FastifyInstance) {
    * }
    * ```
    */
-  app.post<{ Body: AnalyzeCodeIn }>(
+  app.post<{ Body: AnalyzeCodeIn | string }>(
     '/',
     {
       schema: {
@@ -66,24 +79,37 @@ export default async function routes(app: FastifyInstance) {
           The analysis works with any programming language or text content.
           Maximum code size is 100KB to prevent abuse.
           
+          Accepts both JSON format ({"code": "..."}) and raw code (Content-Type: text/plain or text/html).
+          
           ## Usage Examples
           
-          ### Simple JavaScript function
+          ### Simple JavaScript function (JSON)
           \`\`\`json
           {
             "code": "function greet(name) { return \`Hello, \${name}!\`; }"
           }
           \`\`\`
           
-          ### Python code with multiple lines
-          \`\`\`json
-          {
-            "code": "def fibonacci(n):\\n    if n <= 1:\\n        return n\\n    return fibonacci(n-1) + fibonacci(n-2)"
-          }
+          ### Python code with multiple lines (Raw)
+          \`\`\`
+          Content-Type: text/plain
+          
+          def fibonacci(n):
+              if n <= 1:
+                  return n
+              return fibonacci(n-1) + fibonacci(n-2)
           \`\`\`
         `,
         tags: ['Analysis'],
-        body: AnalyzeCodeInSchema,
+        body: {
+          oneOf: [
+            AnalyzeCodeInSchema,
+            {
+              type: 'string',
+              description: 'Raw code content (when Content-Type is text/plain or text/html)'
+            }
+          ]
+        },
         response: {
           200: {
             description: 'Analysis completed successfully',
@@ -106,7 +132,29 @@ export default async function routes(app: FastifyInstance) {
     },
     async (req, rep) => {
       try {
-        const result = analyzeSnippet(req.body.code);
+        let code: string;
+        
+        // Check content type and extract code accordingly
+        const contentType = req.headers['content-type'] || '';
+        
+        if (contentType.includes('text/plain') || contentType.includes('text/html')) {
+          // Raw code content
+          code = req.body as string;
+        } else {
+          // JSON content
+          const body = req.body as AnalyzeCodeIn;
+          code = body?.code || '';
+        }
+        
+        // Validate input
+        if (!code || typeof code !== 'string') {
+          return rep.status(400).send({
+            error: 'Code is required and must be a non-empty string',
+            statusCode: 400
+          });
+        }
+        
+        const result = await analyzeSnippet(code);
         return rep.send(result);
       } catch (error) {
         app.log.error('Error analyzing code:', error);

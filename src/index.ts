@@ -10,6 +10,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export function buildServer() {
   const app = Fastify({ logger: true });
 
+  // Add content type parsers for text/html and text/plain
+  app.addContentTypeParser('text/html', { parseAs: 'string' }, (req, body, done) => {
+    done(null, body);
+  });
+
+  app.addContentTypeParser('text/plain', { parseAs: 'string' }, (req, body, done) => {
+    done(null, body);
+  });
+
   // Swagger / OpenAPI
   app.register(swagger, {
     openapi: {
