@@ -5,7 +5,7 @@ import {
   LinksCodeErrorSchema,
   LinksCodeIn
 } from './links.schema.js';
-import { extractLinks } from '../../../utils/links';
+import { extractLinks } from '../../../utils/links.js';
 
 /**
  * Register links analysis routes with the Fastify application
