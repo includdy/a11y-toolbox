@@ -56,6 +56,9 @@ export const LinksCodeOutSchema = Type.Object({
         selector: Type.String({
             description: 'CSS selector for the element'
         }),
+        accessibleText: Type.String({
+            description: 'The accessible text of the element'
+        }),
         innerText: Type.String({
             description: 'The text content of the element'
         })

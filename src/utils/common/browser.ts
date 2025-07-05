@@ -11,6 +11,7 @@ declare global {
         getSelector: (element: Element) => string;
         getFriendlyUriEnd: (uri: string) => string;
         getNodeAttributes: (node: Element) => Attr[];
+        getAccessibleText: (element: Element) => string;
     }
 }
 
@@ -66,7 +67,7 @@ export class BrowserManager {
         const getFriendlyUriEndCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'get-friendly-uri-end.js'), 'utf8');
         const getNodeAttributesCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'get-node-attributes.js'), 'utf8');
         const enhancedSelectorCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'enhanced-selector.js'), 'utf8');
-        
+        const getAccessibleTextCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'accessible-text.js'), 'utf8');
         // Load modules in proper dependency order
         // First load escapeSelector (no dependencies)
         await page.addScriptTag({
@@ -117,6 +118,12 @@ export class BrowserManager {
         await page.addScriptTag({
             content: enhancedSelectorCode
         });
+
+        // Load the accessible text logic
+        await page.addScriptTag({
+            content: getAccessibleTextCode
+                .replace('export default getAccessibleText;', 'window.getAccessibleText = getAccessibleText;')
+        });
         
         // Verify only the required functions are loaded
         const functionsAvailable = await page.evaluate(() => {
@@ -125,7 +132,8 @@ export class BrowserManager {
                 getXpath: typeof window.getXpath === 'function',
                 getSelector: typeof window.getSelector === 'function',
                 getFriendlyUriEnd: typeof window.getFriendlyUriEnd === 'function',
-                getNodeAttributes: typeof window.getNodeAttributes === 'function'
+                getNodeAttributes: typeof window.getNodeAttributes === 'function',
+                getAccessibleText: typeof window.getAccessibleText === 'function'
             };
         });
         

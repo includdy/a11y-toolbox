@@ -11,6 +11,7 @@ interface LinkInfo {
     tagName: string;
     xpath: string;
     selector: string;
+    accessibleText: string;
     innerText: string;
 }
 
@@ -61,6 +62,7 @@ async function extractLinks(htmlString: string): Promise<LinkInfo[]> {
                     // Use your getXpath function
                     let xpath = '';
                     let selector = '';
+                    let accessibleText = '';
                     try {
                         // Call your getXpath function
                         if (typeof (window as any).getXpath === 'function') {
@@ -81,11 +83,25 @@ async function extractLinks(htmlString: string): Promise<LinkInfo[]> {
                             selector = 'function-not-available';
                         }
                         
+                        // Calculate accessible text
+                        if (typeof (window as any).getAccessibleText === 'function') {
+                            try {
+                                accessibleText = (window as any).getAccessibleText(element);
+                            } catch (accessibleTextError) {
+                                console.error('getAccessibleText function failed:', accessibleTextError);
+                                accessibleText = element.textContent || '';
+                            }
+                        } else {
+                            console.error('getAccessibleText function not available');
+                            accessibleText = element.textContent || '';
+                        }
+                        
                     } catch (e) {
                         // Fallback if functions fail
                         console.error('Function execution failed:', e);
                         xpath = 'error-generating-xpath';
                         selector = 'error-generating-selector';
+                        accessibleText = element.textContent || '';
                     }
                     
                     const linkInfo = {
@@ -96,7 +112,8 @@ async function extractLinks(htmlString: string): Promise<LinkInfo[]> {
                         tagName: tagName,
                         xpath: xpath,
                         selector: selector,
-                        innerText: element.textContent || ''
+                        innerText: element.textContent || '',
+                        accessibleText: accessibleText
                     };
                     
                     links.push(linkInfo);
