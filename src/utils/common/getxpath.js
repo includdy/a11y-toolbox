@@ -49,24 +49,21 @@ function getXPathArray(node, path) {
     const element = {};
     element.str = node.nodeName.toLowerCase();
     
-    // Skip ID and class capture for html and body elements
-    if (element.str !== 'html' && element.str !== 'body') {
-        // add the id and the count so we can construct robust versions of the xpath
-        const id = node.getAttribute && escapeSelector(node.getAttribute('id'));
-        if (id && node.ownerDocument.querySelectorAll('#' + id).length === 1) {
-            element.id = node.getAttribute('id');
-        }
-        
-        // add class information
-        const className = node.getAttribute && node.getAttribute('class');
-        if (className && className.trim()) {
-            // Store the first class for XPath (most specific usually)
-            const classes = className.trim().split(/\s+/);
-            if (classes.length > 0) {
-                element.className = classes[0];
-            }
-        }
-    }
+      // add the id and the count so we can construct robust versions of the xpath
+      const id = node.getAttribute && escapeSelector(node.getAttribute('id'));
+      if (id && node.ownerDocument.querySelectorAll('#' + id).length === 1) {
+          element.id = node.getAttribute('id');
+      }
+      
+      // add class information
+      const className = node.getAttribute && node.getAttribute('class');
+      if (className && className.trim()) {
+          // Store the first class for XPath (most specific usually)
+          const classes = className.trim().split(/\s+/);
+          if (classes.length > 0) {
+              element.className = classes[0];
+          }
+      }
     
     if (count > 1) {
         element.count = count;

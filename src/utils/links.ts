@@ -11,10 +11,6 @@ declare global {
         getSelector: (element: Element) => string;
         getFriendlyUriEnd: (uri: string) => string;
         getNodeAttributes: (node: Element) => Attr[];
-        matchesSelector: (element: Element, selector: string) => boolean;
-        isXHTML: (document: Document) => boolean;
-        getShadowSelector: (generateSelector: Function, element: Element, options?: any) => string;
-        memoize: (fn: Function) => Function;
     }
 }
 
@@ -78,39 +74,18 @@ class LinkParser {
             // Set the HTML content
             await page.setContent(htmlString, { waitUntil: 'domcontentloaded' });
             
-            // Read the modules and convert them to browser-compatible code
+            // Read only the modules that are actually used
             const escapeSelectorCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'common/escape-selector.js'), 'utf8');
             const getXpathCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'common/getxpath.js'), 'utf8');
             const getSelectorCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'common/get-selector.js'), 'utf8');
             const getFriendlyUriEndCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'common/get-friendly-uri-end.js'), 'utf8');
             const getNodeAttributesCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'common/get-node-attributes.js'), 'utf8');
-            const elementMatchesCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'common/element-matches.js'), 'utf8');
-            const isXHTMLCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'common/is-xhtml.js'), 'utf8');
-            const getShadowSelectorCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'common/get-shadow-selector.js'), 'utf8');
-            const enhancedSelectorCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'enhanced-selector.js'), 'utf8');
+            const enhancedSelectorCode = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'common/enhanced-selector.js'), 'utf8');
             
             // Load modules in proper dependency order
             // First load escapeSelector (no dependencies)
             await page.addScriptTag({
                 content: escapeSelectorCode.replace('export default escapeSelector;', 'window.escapeSelector = escapeSelector;')
-            });
-            
-            // Load a simple memoize implementation since the original depends on external library
-            await page.addScriptTag({
-                content: `
-                    window.memoize = function(fn) {
-                        const cache = new Map();
-                        return function(...args) {
-                            const key = JSON.stringify(args);
-                            if (cache.has(key)) {
-                                return cache.get(key);
-                            }
-                            const result = fn.apply(this, args);
-                            cache.set(key, result);
-                            return result;
-                        };
-                    };
-                `
             });
             
             // Load getFriendlyUriEnd (depends on escapeSelector)
@@ -129,30 +104,7 @@ class LinkParser {
                     .replace(/escapeSelector\(/g, 'window.escapeSelector(')
             });
             
-            // Load elementMatches (note: it exports matchesSelector, not elementMatches)
-            await page.addScriptTag({
-                content: elementMatchesCode
-                    .replace(/import.*?from.*?['"].*?['"];?\s*/g, '')
-                    .replace('export default matchesSelector;', 'window.matchesSelector = matchesSelector;')
-            });
-            
-            // Load isXHTML (depends on memoize)
-            await page.addScriptTag({
-                content: isXHTMLCode
-                    .replace(/import.*?from.*?['"].*?['"];?\s*/g, '')
-                    .replace('export default isXHTML;', 'window.isXHTML = isXHTML;')
-                    .replace(/memoize\(/g, 'window.memoize(')
-            });
-            
-            // Load getShadowSelector (depends on escapeSelector)
-            await page.addScriptTag({
-                content: getShadowSelectorCode
-                    .replace(/import.*?from.*?['"].*?['"];?\s*/g, '')
-                    .replace('export default function getShadowSelector', 'window.getShadowSelector = function getShadowSelector')
-                    .replace(/escapeSelector\(/g, 'window.escapeSelector(')
-            });
-            
-            // Then load getXpath (depends on escapeSelector)
+            // Load getXpath (depends on escapeSelector)
             await page.addScriptTag({
                 content: getXpathCode
                     .replace('import escapeSelector from \'./escape-selector.js\';', '')
@@ -169,29 +121,26 @@ class LinkParser {
                     .replace(/escapeSelector\(/g, 'window.escapeSelector(')
                     .replace(/getFriendlyUriEnd\(/g, 'window.getFriendlyUriEnd(')
                     .replace(/getNodeAttributes\(/g, 'window.getNodeAttributes(')
+                    // Provide stub implementations for unused functions
                     .replace(/matchesSelector\(/g, 'window.matchesSelector(')
                     .replace(/isXHTML\(/g, 'window.isXHTML(')
                     .replace(/getShadowSelector\(/g, 'window.getShadowSelector(')
                     .replace(/memoize\(/g, 'window.memoize(')
             });
             
-            // Finally load the enhanced selector logic
+            // Load the enhanced selector logic
             await page.addScriptTag({
                 content: enhancedSelectorCode
             });
             
-            // Verify functions are loaded
+            // Verify only the required functions are loaded
             const functionsAvailable = await page.evaluate(() => {
                 return {
                     escapeSelector: typeof window.escapeSelector === 'function',
                     getXpath: typeof window.getXpath === 'function',
                     getSelector: typeof window.getSelector === 'function',
                     getFriendlyUriEnd: typeof window.getFriendlyUriEnd === 'function',
-                    getNodeAttributes: typeof window.getNodeAttributes === 'function',
-                    elementMatches: typeof window.matchesSelector === 'function',
-                    isXHTML: typeof window.isXHTML === 'function',
-                    getShadowSelector: typeof window.getShadowSelector === 'function',
-                    memoize: typeof window.memoize === 'function'
+                    getNodeAttributes: typeof window.getNodeAttributes === 'function'
                 };
             });
             
