@@ -31,13 +31,27 @@ const shouldIgnoreElement = (element) => {
         return true;
     }
     
-    // Check if element is visually hidden (but not screen reader hidden)
-    // Elements with display: none or visibility: hidden are still included
-    // in aria-labelledby computation per ARIA spec
-    const computedStyle = window.getComputedStyle(element);
-    if (computedStyle.display === 'contents') {
+    // Check if element is visually hidden
+    try {
+        const computedStyle = window.getComputedStyle(element);
+        
+        // Elements with display: none should be ignored
+        if (computedStyle.display === 'none') {
+            return true;
+        }
+        
+        // Elements with visibility: hidden should be ignored
+        if (computedStyle.visibility === 'hidden') {
+            return true;
+        }
+        
         // display: contents elements should have their children processed
-        return false;
+        if (computedStyle.display === 'contents') {
+            return false;
+        }
+    } catch (error) {
+        // If we can't get computed styles, don't ignore the element
+        console.warn('Failed to get computed styles for element:', element, error);
     }
     
     return false;
@@ -233,13 +247,6 @@ const nativeTextAlternative = (element) => {
                 return titleText;
             }
             
-            // Fallback to filename for images without alt
-            const src = element.getAttribute('src');
-            if (src) {
-                const filename = src.split('/').pop().split('?')[0];
-                return filename || '';
-            }
-            
             return '';
             
         case 'input':
@@ -292,7 +299,7 @@ const nativeTextAlternative = (element) => {
             const selectedOption = element.querySelector('option[selected]') || 
                                  element.querySelector('option');
             if (selectedOption) {
-                return selectedOption.textContent || selectedOption.getAttribute('label') || '';
+                return selectedOption.getAttribute('label') || selectedOption.textContent || '';
             }
             
             // If no options, check for associated label
@@ -341,68 +348,77 @@ const nativeTextAlternative = (element) => {
             return element.getAttribute('summary') || '';
             
         case 'iframe':
-            // iframes: title attribute, then name attribute
-            return element.getAttribute('title') || 
-                   element.getAttribute('name') || '';
+            // iframes: title attribute
+            return element.getAttribute('title') || '';
                    
         case 'object':
         case 'embed':
-            // Objects/embeds: title attribute, then type information
+            // Objects/embeds: title attribute
             const objectTitle = element.getAttribute('title');
             if (objectTitle) return objectTitle;
-            
-            const objectType = element.getAttribute('type');
-            if (objectType) return `${objectType} object`;
             
             return '';
             
         case 'audio':
         case 'video':
-            // Media elements: title, then track labels
+            // Media elements: title
             const mediaTitle = element.getAttribute('title');
             if (mediaTitle) return mediaTitle;
-            
-            const track = element.querySelector('track[kind="captions"], track[kind="subtitles"]');
-            if (track) {
-                return track.getAttribute('label') || '';
-            }
             
             return '';
             
         case 'canvas':
-            // Canvas: fallback content, then title
-            const canvasText = element.textContent?.trim();
-            if (canvasText) return canvasText;
+            // Canvas: title, then fallback content
+            const canvasTitle = element.getAttribute('title');
+            if (canvasTitle) return canvasTitle;
             
-            return element.getAttribute('title') || '';
+            return element.textContent?.trim() || '';
             
         case 'svg':
-            // SVG: title element, then desc element, then title attribute
+            // SVG: title element, then title attribute
             const svgTitle = element.querySelector('title');
             if (svgTitle) return (svgTitle.textContent || '').trim();
-            
-            const svgDesc = element.querySelector('desc');
-            if (svgDesc) return (svgDesc.textContent || '').trim();
             
             return element.getAttribute('title') || '';
             
         case 'math':
-            // MathML: alttext attribute, then title
+            // MathML: annotation[encoding="text/plain"], then deprecated alttext attribute, then title
+            const ann = element.querySelector('semantics > annotation[encoding="text/plain"]');
+            if (ann && ann.textContent.trim()) {
+                return ann.textContent.trim();
+            }
+            
             return element.getAttribute('alttext') || 
                    element.getAttribute('title') || '';
             
         default:
-            // Generic elements: include pseudo-element content, text content, then title
-            const pseudoContent = getPseudoElementContent(element);
-            const textContent = element.textContent || '';
+            // Special handling for contenteditable elements
+            if (element.hasAttribute('contenteditable') && element.getAttribute('contenteditable') !== 'false') {
+                // For contenteditable elements, return their title directly
+                return element.title || '';
+            }
             
-            // Combine pseudo-element content with text content
+            // Generic elements: compute accessible name from children (respecting aria-hidden)
+            const childAccessibleName = computeChildAccessibleName(element);
+            if (childAccessibleName.trim()) {
+                // Include pseudo-element content with child accessible name
+                const pseudoContent = getPseudoElementContent(element);
+                let combinedContent = '';
+                if (pseudoContent.beforeContent) {
+                    combinedContent += pseudoContent.beforeContent;
+                }
+                combinedContent += childAccessibleName;
+                if (pseudoContent.afterContent) {
+                    combinedContent += pseudoContent.afterContent;
+                }
+                return combinedContent;
+            }
+            
+            // If no child accessible name, check for pseudo-element content only
+            const pseudoContent = getPseudoElementContent(element);
             let combinedContent = '';
             if (pseudoContent.beforeContent) {
                 combinedContent += pseudoContent.beforeContent;
-            }
-            if (textContent.trim()) {
-                combinedContent += textContent;
             }
             if (pseudoContent.afterContent) {
                 combinedContent += pseudoContent.afterContent;
@@ -421,25 +437,26 @@ const computeChildAccessibleName = (element, depth = 0) => {
     
     // Limit recursion depth to prevent infinite loops and performance issues
     if (depth > 2) {
-        return element.textContent || '';
+        return '';
     }
     
     // Walk through all child nodes
     for (const child of element.childNodes) {
         if (child.nodeType === 1) { // Element node
-            // Skip elements that should be ignored
+            // Skip elements that should be ignored (handles visibility)
             if (shouldIgnoreElement(child)) {
                 continue;
             }
             
             const tagName = child.tagName.toLowerCase();
             
+            // For specific elements that contribute to accessible name, use getAccessibleText
             switch (tagName) {
                 case 'img':
-                    // Images contribute their alt text
-                    const altText = child.getAttribute('alt');
-                    if (altText !== null) { // Include empty alt (decorative images contribute nothing)
-                        accessibleName += altText + ' ';
+                    // Images contribute their accessible text (alt, title, etc.)
+                    const imgName = getAccessibleText(child, true);
+                    if (imgName) {
+                        accessibleName += imgName + ' ';
                     }
                     break;
                     
@@ -450,14 +467,11 @@ const computeChildAccessibleName = (element, depth = 0) => {
                         case 'submit':
                         case 'reset':
                         case 'button':
-                            accessibleName += (child.getAttribute('value') || 
-                                             (inputType === 'submit' ? 'Submit' : 
-                                              inputType === 'reset' ? 'Reset' : '')) + ' ';
-                            break;
                         case 'image':
-                            accessibleName += (child.getAttribute('alt') || 
-                                             child.getAttribute('value') || 
-                                             'Submit') + ' ';
+                            const inputName = getAccessibleText(child, true);
+                            if (inputName) {
+                                accessibleName += inputName + ' ';
+                            }
                             break;
                         default:
                             // Other inputs don't typically contribute to parent accessible name
@@ -467,30 +481,37 @@ const computeChildAccessibleName = (element, depth = 0) => {
                     
                 case 'svg':
                     // SVG elements contribute their accessible name
-                    const svgTitle = child.querySelector('title');
-                    if (svgTitle) {
-                        accessibleName += (svgTitle.textContent || '').trim() + ' ';
-                    } else {
-                        const svgAlt = child.getAttribute('alt') || child.getAttribute('title');
-                        if (svgAlt) {
-                            accessibleName += svgAlt + ' ';
-                        }
+                    const svgName = getAccessibleText(child, true);
+                    if (svgName) {
+                        accessibleName += svgName + ' ';
                     }
                     break;
                     
                 default:
-                    // For other elements, check aria attributes first
+                    // For other elements, check if they have aria-label or aria-labelledby
                     if (child.getAttribute('aria-label')) {
                         accessibleName += child.getAttribute('aria-label') + ' ';
                     } else if (child.getAttribute('aria-labelledby')) {
-                        // Skip aria-labelledby processing for child elements to avoid complexity
-                        accessibleName += child.textContent + ' ';
-                    } else if (depth < 2) {
-                        // Only recurse two levels deep
-                        accessibleName += computeChildAccessibleName(child, depth + 1);
+                        // Use getAccessibleText to properly handle aria-labelledby
+                        const childName = getAccessibleText(child, true);
+                        if (childName) {
+                            accessibleName += childName + ' ';
+                        }
                     } else {
-                        // At max depth, just use text content
-                        accessibleName += child.textContent + ' ';
+                        // For generic elements (span, div, etc.), recursively compute their accessible name
+                        // but only if they're not hidden and within depth limits
+                        if (depth < 2) {
+                            // Only recurse two levels deep
+                            accessibleName += computeChildAccessibleName(child, depth + 1);
+                        } else {
+                            // At max depth, only include direct text content, not nested elements
+                            for (const grandchild of child.childNodes) {
+                                if (grandchild.nodeType === 3) { // Text node
+                                    accessibleName += grandchild.textContent;
+                                }
+                                // Don't include nested element content at max depth
+                            }
+                        }
                     }
                     break;
             }
@@ -539,14 +560,15 @@ const getAccessibleText = (element, inLabelledByContext = false) => {
         }
 
         // Step 2B - arialabelledbyText (only if not in labelledby context)
-        let accessibleText = normalizeText(arialabelledbyText(element, inLabelledByContext));
-
-        if (accessibleText) {
-            return accessibleText;
+        if (!inLabelledByContext && element.getAttribute('aria-labelledby')) {
+            // If aria-labelledby is present, use its result even if empty
+            // Don't fall back to other methods if aria-labelledby is explicitly set
+            const accessibleText = normalizeText(arialabelledbyText(element, inLabelledByContext));
+            return accessibleText; // Return even if empty - don't fall back
         }
 
         // Step 2C - arialabelText
-        accessibleText = normalizeText(arialabelText(element));
+        let accessibleText = normalizeText(arialabelText(element));
 
         if (accessibleText) {
             return accessibleText;

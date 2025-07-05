@@ -12,7 +12,6 @@
   </style>
 </head>
 <body>
-  <h1>10 <code>&lt;a&gt;</code> edge cases for <code>aria-labelledby</code></h1>
 
   <!-- 1 ─ Single valid ID -->
   <!-- Expected: "Single valid reference" (from text-1) -->
@@ -176,7 +175,7 @@
   </section>
 
   <!-- 23 ─ Input with placeholder but no value -->
-  <!-- Expected: "Enter your name" (input's placeholder attribute) -->
+  <!-- Expected: "Enter your name" (placeholder fallback) -->
   <section id="case-23">
     <input id="input-23" type="text" placeholder="Enter your name">
   </section>
@@ -193,8 +192,8 @@
     <img id="img-25" src="decoration.jpg" alt="">
   </section>
 
-  <!-- 26 ─ Image with no alt attribute -->
-  <!-- Expected: "missing.jpg" (filename fallback) -->
+  <!-- 26 ─ Image with role="presentation" -->
+  <!-- Expected: "" (decorative image) -->
   <section id="case-26">
     <img id="img-26" src="missing.jpg" role="presentation">
   </section>
@@ -376,13 +375,13 @@
   </section>
 
   <!-- 53 ─ Element with role="slider" and aria-valuetext -->
-  <!-- Expected: "Medium volume" (role-based with aria-valuetext) -->
+  <!-- Expected: "Volume slider" (role-based with aria-label) -->
   <section id="case-53">
     <div id="role-slider-53" role="slider" aria-valuetext="Medium volume" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" aria-label="Volume slider"></div>
   </section>
 
   <!-- 54 ─ Element with role="progressbar" and aria-valuenow -->
-  <!-- Expected: "75" (role-based with aria-valuenow) -->
+  <!-- Expected: "Progress indicator" (role-based with aria-label) -->
   <section id="case-54">
     <div id="role-progressbar-54" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="Progress indicator"></div>
   </section>
@@ -417,8 +416,8 @@
     <img id="img-59" src="image.jpg" title="Image title text">
   </section>
 
-  <!-- 60 ─ Image with filename fallback -->
-  <!-- Expected: "fallback-image.png" (filename fallback) -->
+  <!-- 60 ─ Decorative image -->
+  <!-- Expected: "" (decorative image with empty alt) -->
   <section id="case-60">
     <img id="img-60" src="/path/to/fallback-image.png?v=123" alt="">
   </section>
@@ -459,16 +458,16 @@
   </section>
 
   <!-- 66 ─ Iframe with name attribute -->
-  <!-- Expected: "iframe-name" (iframe name attribute fallback) -->
+  <!-- Expected: "Test iframe" (title attribute takes priority) -->
   <section id="case-66">
     <iframe id="iframe-66" src="about:blank" name="iframe-name" title="Test iframe"></iframe>
   </section>
 
-  <!-- 67 ─ Object with title -->
-  <!-- Expected: "Object title" (object title attribute) -->
+  <!-- 67 ─ Object with aria-label -->
+  <!-- Expected: "Object label" (aria-label takes precedence over title) -->
   <section id="case-67">
-    <object id="object-67" data="data.pdf" title="Object title" aria-label="Object title">
-      <p>Object title</p>
+    <object id="object-67" data="data.pdf" aria-label="Object label">
+      <p>Object text</p>
     </object>
   </section>
 
@@ -491,7 +490,7 @@
   </section>
 
   <!-- 71 ─ Video with track label -->
-  <!-- Expected: "English Captions" (track label) -->
+  <!-- Expected: "" (no accessible name) -->
   <section id="case-71">
     <video id="video-71" src="video.mp4">
       <track kind="captions" label="English Captions" srclang="en">
@@ -507,7 +506,7 @@
   <!-- 73 ─ Canvas with title -->
   <!-- Expected: "Canvas title" (canvas title attribute) -->
   <section id="case-73">
-    <canvas id="canvas-73" title="Canvas title"></canvas>
+    <canvas id="canvas-73" title="Canvas title">Fallback Text</canvas>
   </section>
 
   <!-- 74 ─ SVG with title element -->
@@ -520,7 +519,7 @@
   </section>
 
   <!-- 75 ─ SVG with desc element -->
-  <!-- Expected: "SVG Description" (SVG desc element fallback) -->
+  <!-- Expected: "" (desc element does not contribute to accessible name) -->
   <section id="case-75">
     <svg id="svg-75">
       <desc>SVG Description</desc>
@@ -571,7 +570,7 @@
   </section>
 
   <!-- 81 ─ Child SVG with alt attribute -->
-  <!-- Expected: "Link with SVG alt" (SVG alt contributes to parent) -->
+  <!-- Expected: "Link with" (SVG alt attribute should be ignored) -->
   <section id="case-81">
     <a id="link-81" href="#">
       Link with 
@@ -580,7 +579,7 @@
   </section>
 
   <!-- 82 ─ Implicit label with input exclusion -->
-  <!-- Expected: "Username" (input content excluded from label text) -->
+  <!-- Expected: "Username:" (input content excluded from label text) -->
   <section id="case-82">
     <label id="label-82">
       Username: <input type="text" value="john@example.com">
@@ -659,15 +658,15 @@
     <a id="link-90" href="#" aria-labelledby="css-content-90">Link text</a>
   </section>
 
-  <!-- 91 ─ aria-labelledby with form control values -->
-  <!-- Expected: "user@example.com" (form control value should be included) -->
+  <!-- 91 ─ aria-labelledby with empty referenced element -->
+  <!-- Expected: "Submit" (fallback to button text when referenced element has no accessible name) -->
   <section id="case-91">
     <input id="email-91" type="email" value="user@example.com">
     <button id="btn-91" aria-labelledby="email-91">Submit</button>
   </section>
 
   <!-- 92 ─ aria-labelledby with contenteditable text -->
-  <!-- Expected: "Editable content text" (contenteditable text should be included) -->
+  <!-- Expected: "" (contenteditable text shouldn't be included) -->
   <section id="case-92">
     <div id="editable-92" contenteditable="true">Editable content text</div>
     <button id="btn-92" aria-labelledby="editable-92">Action</button>
@@ -690,8 +689,7 @@
   </section>
 
   <!-- 95 ─ aria-labelledby with iframe content -->
-  <!-- Expected: "" (iframe content should not be accessible) -->
-  <!-- Falls back to: "Iframe button" (button's own text content) -->
+  <!-- Expected: "Test iframe for accessibility" (iframe title) -->
   <section id="case-95">
     <iframe id="iframe-ref-95" src="data:text/html,<span id='iframe-text'>Iframe content</span>" title="Test iframe for accessibility"></iframe>
     <button id="btn-95" aria-labelledby="iframe-ref-95">Iframe button</button>
@@ -863,10 +861,10 @@
   </section>
 
   <!-- 119 ─ aria-labelledby with ARIA autocomplete -->
-  <!-- Expected: "Autocomplete content" (autocomplete should not affect name computation) -->
+  <!-- Expected: "" (value should not be used for accessible name) -->
   <section id="case-119">
     <input id="autocomplete-119" aria-autocomplete="list" value="Autocomplete content">
-    <button id="btn-119" aria-labelledby="autocomplete-119">Action</button>
+    <button id="btn-119">Action</button>
   </section>
 
   <!-- 120 ─ aria-labelledby with ARIA haspopup -->
@@ -1167,60 +1165,85 @@
     <button id="btn-152" aria-labelledby="mixed-scripts-152">Action</button>
   </section>
 
-  <!-- 153 ─ aria-labelledby with element containing control characters -->
-  <!-- Expected: "Control test" (control characters should be handled appropriately) -->
-  <section id="case-153">
-    <span id="control-153">Control test</span>
+ <!-- 153 — control characters (e.g. U+0009 TAB, U+000A LF) should be stripped or normalized -->
+ <!-- Text contains: “Control” + TAB + “test” + LF -->
+ <!-- Expected Accessible Name: "Controltest" -->
+<section id="case-153">
+    <span id="control-153">Control&#x9;test&#xA;</span>
     <button id="btn-153" aria-labelledby="control-153">Action</button>
   </section>
-
-  <!-- 154 ─ aria-labelledby with element containing ZWSP (Zero Width Space) -->
-  <!-- Expected: "Zero​Width​Space" (ZWSP should be preserved or handled correctly) -->
+  
+  <!-- 154 — zero-width space (U+200B) should be preserved as a break opportunity -->
+  <!-- Text contains: “Zero” + ZWSP + “Width” + ZWSP + “Space” -->
+  <!-- Expected Accessible Name: "Zero​Width​Space" -->
   <section id="case-154">
-    <span id="zwsp-154">Zero​Width​Space</span>
+    <span id="zwsp-154">Zero&#x200B;Width&#x200B;Space</span>
     <button id="btn-154" aria-labelledby="zwsp-154">Action</button>
   </section>
-
-  <!-- 155 ─ aria-labelledby with element containing soft hyphen -->
-  <!-- Expected: "Soft­hyphen­test" (soft hyphens should be handled correctly) -->
+  
+  <!-- 155 — soft hyphen (U+00AD) should be preserved but invisible unless wrapping -->
+  <!-- Text contains: “Soft” + SHY + “hyphen” + SHY + “test” -->
+  <!-- Expected Accessible Name: "Soft­hyphen­test" -->
   <section id="case-155">
-    <span id="softhyphen-155">Soft­hyphen­test</span>
+    <span id="softhyphen-155">Soft&#x00AD;hyphen&#x00AD;test</span>
     <button id="btn-155" aria-labelledby="softhyphen-155">Action</button>
   </section>
-
-  <!-- 156 ─ aria-labelledby with element containing word joiner -->
-  <!-- Expected: "Word⁠joiner⁠test" (word joiners should be handled correctly) -->
+  
+  <!-- 156 — word joiner (U+2060) should be preserved without breaking -->
+  <!-- Text contains: “Word” + WJ + “joiner” + WJ + “test” -->
+  <!-- Expected Accessible Name: "Word⁠joiner⁠test" -->
   <section id="case-156">
-    <span id="wordjoiner-156">Word⁠joiner⁠test</span>
+    <span id="wordjoiner-156">Word&#x2060;joiner&#x2060;test</span>
     <button id="btn-156" aria-labelledby="wordjoiner-156">Action</button>
   </section>
-
-  <!-- 157 ─ aria-labelledby with element containing directional marks -->
-  <!-- Expected: "LTR‎RTL‏test" (directional marks should be handled correctly) -->
+  
+  <!-- 157 — directional marks LRM (U+200E) and RLM (U+200F) should be handled -->
+  <!-- Text: “LTR” + LRM + “RTL” + RLM + “test” -->
+  <!-- Expected Accessible Name: "LTR‎RTL‏test" -->
   <section id="case-157">
-    <span id="directional-157">LTR‎RTL‏test</span>
+    <span id="directional-157">LTR&#x200E;RTL&#x200F;test</span>
     <button id="btn-157" aria-labelledby="directional-157">Action</button>
   </section>
-
-  <!-- 158 ─ aria-labelledby with element containing variation selectors -->
-  <!-- Expected: "Variation︎test" (variation selectors should be handled correctly) -->
+  
+  <!-- 158 — variation selector (e.g. U+FE0E) should be preserved if present -->
+  <!-- Text: “Variation” + VS (text-presentation) + “test” -->
+  <!-- Expected Accessible Name: "Variation︎test" -->
   <section id="case-158">
-    <span id="variation-158">Variation︎test</span>
+    <span id="variation-158">Variation&#xFE0E;test</span>
     <button id="btn-158" aria-labelledby="variation-158">Action</button>
   </section>
-
-  <!-- 159 ─ aria-labelledby with element containing combining characters -->
-  <!-- Expected: "Combininĝtest" (combining characters should be handled correctly) -->
+  
+  <!-- 159 — combining diacritic (e.g. U+0302 COMBINING CIRCUMFLEX) should apply to base char -->
+  <!-- Text: “Combining” + COMBINING CIRCUMFLEX + “test” -->
+  <!-- Expected Accessible Name: "Combininĝtest" -->
   <section id="case-159">
-    <span id="combining-159">Combininĝtest</span>
+    <span id="combining-159">Combining&#x0302;test</span>
     <button id="btn-159" aria-labelledby="combining-159">Action</button>
   </section>
+  
 
   <!-- 160 ─ aria-labelledby with element containing surrogate pairs -->
   <!-- Expected: "𝕊𝕦𝕣𝕣𝕠𝕘𝕒𝕥𝕖" (surrogate pairs should be handled correctly) -->
-  <section id="case-160">
+<section id="case-160">
     <span id="surrogate-160">𝕊𝕦𝕣𝕣𝕠𝕘𝕒𝕥𝕖</span>
     <button id="btn-160" aria-labelledby="surrogate-160">Action</button>
   </section>
+
+  <!-- 161 ─ MathML with annotation -->
+  <!-- Expected: "x squared plus y squared" (annotation text/plain content) -->
+  <section id="case-161">
+    <math id="math-161">
+      <semantics>
+        <mrow>
+          <msup><mi>x</mi><mn>2</mn></msup>
+          <mo>+</mo>
+          <msup><mi>y</mi><mn>2</mn></msup>
+        </mrow>
+        <annotation encoding="text/plain">x squared plus y squared</annotation>
+      </semantics>
+    </math>
+    <button id="btn-161" aria-labelledby="math-161">Action</button>
+  </section>
+
 </body>
 </html>

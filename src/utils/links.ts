@@ -13,8 +13,8 @@ interface LinkInfo {
     selector: string;
     accessibleText: string;
     innerText: string;
-    pseudoBefore: string;
-    pseudoAfter: string;
+    pseudoBefore?: string;
+    pseudoAfter?: string;
 }
 
 /**
@@ -172,8 +172,8 @@ async function extractLinks(htmlString: string): Promise<LinkInfo[]> {
                         xpath: xpath,
                         selector: selector,
                         innerText: element.textContent || '',
-                        pseudoBefore: pseudoBefore,
-                        pseudoAfter: pseudoAfter,
+                        pseudoBefore: pseudoBefore || undefined,
+                        pseudoAfter: pseudoAfter || undefined,
                         accessibleText: accessibleText
                     };
                     
