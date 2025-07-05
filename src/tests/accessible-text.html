@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>aria-labelledby edge-case playground – links only</title>
+  <style>
+    body                { font-family: sans-serif; line-height: 1.5; margin: 2rem; }
+    section             { margin-bottom: 2rem; padding: 1rem; border: 1px solid #ccc; border-radius: .5rem; }
+    .hidden             { display: none; }          /* case 6 */
+    .visually-hidden    { position: absolute; width: 1px; height: 1px;
+                          overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <h1>10 <code>&lt;a&gt;</code> edge cases for <code>aria-labelledby</code></h1>
+
+  <!-- 1 ─ Single valid ID -->
+  <!-- Expected: "Single valid reference" (from text-1) -->
+  <section id="case-1">
+    <p id="text-1">Single valid reference</p>
+    <a id="link-1" href="#" aria-labelledby="text-1">ignored link text</a>
+  </section>
+
+  <!-- 2 ─ Multiple valid IDs (order preserved) -->
+  <!-- Expected: "Save Draft" (text-2a + text-2b, space-separated) -->
+  <section id="case-2">
+    <span id="text-2a">Save</span>
+    <span id="text-2b">Draft</span>
+    <a id="link-2" href="#" aria-labelledby="text-2a text-2b">BTN 2</a>
+  </section>
+
+  <!-- 3 ─ Mix of valid and missing IDs -->
+  <!-- Expected: "Real Heading" (text-3 found, ghost-id ignored) -->
+  <section id="case-3">
+    <span id="text-3">Real Heading</span>
+    <!-- "ghost-id" does not exist -->
+    <a id="link-3" href="#" aria-labelledby="text-3 ghost-id">BTN 3</a>
+  </section>
+
+  <!-- 4 ─ Self-reference (should be ignored by guard) -->
+  <!-- Expected: "" (empty string - self-reference creates infinite loop, so aria-labelledby is ignored) -->
+  <!-- Falls back to: "Self-referencing link" (link's own text content) -->
+  <section id="case-4">
+    <a id="link-4" href="#" aria-labelledby="link-4">Self-referencing link</a>
+  </section>
+
+  <!-- 5 ─ Mutual (circular) reference -->
+  <!-- Expected: "second in loop" (link-5a references link-5b, but link-5b's aria-labelledby is ignored due to inLabelledByContext) -->
+  <section id="case-5">
+    <a id="link-5a" href="#" aria-labelledby="link-5b">first in loop</a>
+    <a id="link-5b" href="#" aria-labelledby="link-5a">second in loop</a>
+  </section>
+
+  <!-- 6 ─ Reference to hidden element -->
+  <!-- Expected: "Hidden Label" (hidden elements still contribute to accessible name) -->
+  <!-- Note: display:none elements are included in aria-labelledby computation per spec -->
+  <section id="case-6">
+    <span id="hidden-text" class="hidden">Hidden Label</span>
+    <a id="link-6" href="#" aria-labelledby="hidden-text">Link with hidden label</a>
+  </section>
+
+  <!-- 7 ─ Reference inside <template> (not in DOM tree) -->
+  <!-- Expected: "" (empty string - template content is not in the active DOM tree) -->
+  <!-- Falls back to: "Link to template label" (link's own text content) -->
+  <section id="case-7">
+    <template>
+      <span id="tmpl-text">Template label</span>
+    </template>
+    <a id="link-7" href="#" aria-labelledby="tmpl-text">Link to template label</a>
+  </section>
+
+  <!-- 8 ─ Duplicate ID in the document (invalid HTML but real-world bug) -->
+  <!-- Expected: "Duplicate A Duplicate B" (both elements with same ID contribute their text) -->
+  <!-- Note: This depends on implementation - some might only use first match -->
+  <section id="case-8">
+    <!-- Two elements with identical id -->
+    <span id="dup-text">Duplicate A</span>
+    <span id="dup-text">Duplicate B</span>
+    <a id="link-8" href="#" aria-labelledby="dup-text">Link with duplicate ID</a>
+  </section>
+
+  <!-- 9 ─ One-level nested aria-labelledby (tests recursion depth) -->
+  <!-- Expected: "Inner" (text-9a's aria-labelledby is ignored due to inLabelledByContext flag) -->
+  <!-- text-9a contains "Inner" as its text content, so that's what gets returned -->
+  <section id="case-9">
+    <span id="text-9a" aria-labelledby="text-9b">Inner</span>
+    <span id="text-9b">Outer Label</span>
+    <a id="link-9" href="#" aria-labelledby="text-9a">Nested labelledby</a>
+  </section>
+
+  <!-- 10 ─ No aria-labelledby attribute (negative control) -->
+  <!-- Expected: "" (empty string from aria-labelledby processing) -->
+  <!-- Falls back to: "Plain link (no aria-labelledby)" (link's own text content) -->
+  <section id="case-10">
+    <a id="link-10" href="#">Plain link (no aria-labelledby)</a>
+  </section>
+
+  <!-- 11 ─ Simple aria-label (basic functionality) -->
+  <!-- Expected: "Custom label from aria-label" -->
+  <section id="case-11">
+    <a id="link-11" href="#" aria-label="Custom label from aria-label">Link text ignored</a>
+  </section>
+
+  <!-- 12 ─ aria-label with whitespace normalization -->
+  <!-- Expected: "Label with multiple spaces" (whitespace should be normalized) -->
+  <section id="case-12">
+    <a id="link-12" href="#" aria-label="  Label   with   multiple   spaces  ">Link text</a>
+  </section>
+
+  <!-- 13 ─ Empty aria-label -->
+  <!-- Expected: "" (empty string) -->
+  <!-- Falls back to: "Link with empty aria-label" (link's own text content) -->
+  <section id="case-13">
+    <a id="link-13" href="#" aria-label="">Link with empty aria-label</a>
+  </section>
+
+  <!-- 14 ─ aria-label with only whitespace -->
+  <!-- Expected: "" (empty string after trim) -->
+  <!-- Falls back to: "Link with whitespace-only aria-label" (link's own text content) -->
+  <section id="case-14">
+    <a id="link-14" href="#" aria-label="   ">Link with whitespace-only aria-label</a>
+  </section>
+
+  <!-- 15 ─ aria-labelledby takes precedence over aria-label -->
+  <!-- Expected: "Labelledby wins" (aria-labelledby takes precedence) -->
+  <section id="case-15">
+    <span id="text-15">Labelledby wins</span>
+    <a id="link-15" href="#" aria-labelledby="text-15" aria-label="Aria-label ignored">Link text also ignored</a>
+  </section>
+
+  <!-- 16 ─ aria-label with missing aria-labelledby reference -->
+  <!-- Expected: "Aria-label fallback" (aria-labelledby fails, falls back to aria-label) -->
+  <section id="case-16">
+    <a id="link-16" href="#" aria-labelledby="nonexistent-id" aria-label="Aria-label fallback">Link text ignored</a>
+  </section>
+
+  <!-- 17 ─ aria-label with special characters -->
+  <!-- Expected: "Special chars: <>&"' (special characters preserved) -->
+  <section id="case-17">
+    <a id="link-17" href="#" aria-label="Special chars: <>&"'">Link text</a>
+  </section>
+
+  <!-- 18 ─ aria-label with Unicode characters -->
+  <!-- Expected: "Unicode: 🔗 → ✓" (Unicode characters preserved) -->
+  <section id="case-18">
+    <a id="link-18" href="#" aria-label="Unicode: 🔗 → ✓">Link text</a>
+  </section>
+
+  <!-- 19 ─ aria-label with line breaks and tabs -->
+  <!-- Expected: "Multi line text" (line breaks and tabs normalized to spaces) -->
+  <section id="case-19">
+    <a id="link-19" href="#" aria-label="Multi
+    line	text">Link text</a>
+  </section>
+
+  <!-- 20 ─ aria-label on nested element interaction -->
+  <!-- Expected: "Parent label" (parent's aria-label used) -->
+  <section id="case-20">
+    <a id="link-20" href="#" aria-label="Parent label">
+      <span aria-label="Child label">Child text</span>
+    </a>
+  </section>
+</body>
+</html>
