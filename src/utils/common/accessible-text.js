@@ -144,16 +144,30 @@ const getPseudoElementContent = (element) => {
         const beforeStyles = window.getComputedStyle(element, '::before');
         const beforeContentValue = beforeStyles.getPropertyValue('content');
         if (beforeContentValue && beforeContentValue !== 'none' && beforeContentValue !== '""') {
-            // Remove quotes from content value
-            beforeContent = beforeContentValue.replace(/^["']|["']$/g, '');
+            // Check if ::before pseudo-element is visible to assistive technologies
+            const beforeDisplay = beforeStyles.getPropertyValue('display');
+            const beforeVisibility = beforeStyles.getPropertyValue('visibility');
+            
+            // Only include content if pseudo-element is visible
+            if (beforeDisplay !== 'none' && beforeVisibility !== 'hidden') {
+                // Remove quotes from content value
+                beforeContent = beforeContentValue.replace(/^["']|["']$/g, '');
+            }
         }
         
         // Get ::after content
         const afterStyles = window.getComputedStyle(element, '::after');
         const afterContentValue = afterStyles.getPropertyValue('content');
         if (afterContentValue && afterContentValue !== 'none' && afterContentValue !== '""') {
-            // Remove quotes from content value
-            afterContent = afterContentValue.replace(/^["']|["']$/g, '');
+            // Check if ::after pseudo-element is visible to assistive technologies
+            const afterDisplay = afterStyles.getPropertyValue('display');
+            const afterVisibility = afterStyles.getPropertyValue('visibility');
+            
+            // Only include content if pseudo-element is visible
+            if (afterDisplay !== 'none' && afterVisibility !== 'hidden') {
+                // Remove quotes from content value
+                afterContent = afterContentValue.replace(/^["']|["']$/g, '');
+            }
         }
     } catch (error) {
         // Ignore errors - pseudo-elements might not be supported or accessible
@@ -587,3 +601,4 @@ const getAccessibleText = (element, inLabelledByContext = false) => {
 };
 
 export default getAccessibleText;
+export { getPseudoElementContent };

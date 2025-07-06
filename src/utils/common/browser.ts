@@ -12,6 +12,7 @@ declare global {
         getFriendlyUriEnd: (uri: string) => string;
         getNodeAttributes: (node: Element) => Attr[];
         getAccessibleText: (element: Element) => string;
+        getPseudoElementContent: (element: Element) => { beforeContent: string; afterContent: string };
     }
 }
 
@@ -123,6 +124,7 @@ export class BrowserManager {
         await page.addScriptTag({
             content: getAccessibleTextCode
                 .replace('export default getAccessibleText;', 'window.getAccessibleText = getAccessibleText;')
+                .replace('export { getPseudoElementContent };', 'window.getPseudoElementContent = getPseudoElementContent;')
         });
         
         // Verify only the required functions are loaded
@@ -133,7 +135,8 @@ export class BrowserManager {
                 getSelector: typeof window.getSelector === 'function',
                 getFriendlyUriEnd: typeof window.getFriendlyUriEnd === 'function',
                 getNodeAttributes: typeof window.getNodeAttributes === 'function',
-                getAccessibleText: typeof window.getAccessibleText === 'function'
+                getAccessibleText: typeof window.getAccessibleText === 'function',
+                getPseudoElementContent: typeof window.getPseudoElementContent === 'function'
             };
         });
         

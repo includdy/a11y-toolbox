@@ -1,14 +1,14 @@
 import { FastifyInstance } from 'fastify';
 import {
-  LinksCodeInSchema,
-  LinksCodeOutSchema,
-  LinksCodeErrorSchema,
-  LinksCodeIn
-} from './links.schema.js';
-import { extractLinks } from '../../../utils/links.js';
+  AcctextCodeInSchema,
+  AcctextCodeOutSchema,
+  AcctextCodeErrorSchema,
+  AcctextCodeIn
+} from './acctext.schema.js';
+import { extractAccessibleText } from '../../../utils/acctext.js';
 
 /**
- * Register links analysis routes with the Fastify application
+ * Register accessible text analysis routes with the Fastify application
  * 
  * @param app - The Fastify instance to register routes with
  */
@@ -16,45 +16,37 @@ export default async function routes(app: FastifyInstance) {
     /**
      * POST /
      * 
-     * Analyzes HTML code and returns links with accessibility information
+     * Analyzes HTML code and returns accessible text for each element of the DOM
      * 
      * Accepts raw HTML:
      * - Raw HTML: Content-Type: text/html with HTML in body
      * 
-     * @example Request (Raw HTML)
-     * ```
-     * Content-Type: text/html
+     * @example Request (JSON)
      * 
      * <html><body><a href='https://example.com'>Example</a></body></html>
      * ```
      * 
      * @example Response
      * ```json
-     * {
-     *   "links": [
-     *     {
-     *       "element": "<a href='https://example.com'>Example</a>",
-     *       "href": "https://example.com",
-     *       "title": "Example",
-     *       "role": "link",
-     *       "tagName": "a",
-     *       "xpath": "/html/body/a",
-     *     }
-     *   ]
-     * }
+     * [
+     *   {
+     *     "element": "<a href='https://example.com'>Example</a>",
+     *     "accessibleText": "Example"
+     *   }
+     * ]
      * ```
      */
-    app.post<{ Body: LinksCodeIn | string }>(
+    app.post<{ Body: AcctextCodeIn | string }>(
         '/',
         {
             schema: {
-                operationId: 'analyzeLinks',
-                summary: 'Analyze HTML code and return links with accessibility information',
-                description: 'Analyzes the provided HTML code and returns all links with comprehensive accessibility information including accessible names, roles, and DOM selectors. Accepts both JSON format ({"code": "html"}) and raw HTML (Content-Type: text/html).',
-                tags: ['Links'],
+                operationId: 'analyzeAcctext',
+                summary: 'Analyze HTML code and return accessible text for each element of the DOM',
+                description: 'Analyzes the provided HTML code and returns accessible text for each element of the DOM. Accepts raw HTML (Content-Type: text/html).',
+                tags: ['Accessible Text'],
                 body: {
                     oneOf: [
-                        LinksCodeInSchema,
+                        AcctextCodeInSchema,
                         {
                             type: 'string',
                             description: 'Raw HTML content (when Content-Type is text/html)'
@@ -64,19 +56,19 @@ export default async function routes(app: FastifyInstance) {
                 response: {
                     200: {
                         description: 'Analysis completed successfully',
-                        ...LinksCodeOutSchema
+                        ...AcctextCodeOutSchema
                     },
                     400: {
                         description: 'Invalid request - code is required and must be a non-empty string',
-                        ...LinksCodeErrorSchema
+                        ...AcctextCodeErrorSchema
                     },
                     413: {
                         description: 'Request too large - code exceeds maximum allowed size',
-                        ...LinksCodeErrorSchema
+                        ...AcctextCodeErrorSchema
                     },
                     500: {
                         description: 'Internal server error during code analysis',
-                        ...LinksCodeErrorSchema
+                        ...AcctextCodeErrorSchema
                     }
                 }
             }
@@ -87,7 +79,7 @@ export default async function routes(app: FastifyInstance) {
                 
                 // Check content type and extract HTML accordingly
                 const contentType = request.headers['content-type'] || '';
-                
+
                 // Validate content type
                 if (!contentType.includes('text/html')) {
                     return reply.status(400).send({
@@ -98,7 +90,7 @@ export default async function routes(app: FastifyInstance) {
 
                 // Get HTML content from request body
                 htmlCode = request.body as string;
-                
+
                 // Validate input
                 if (!htmlCode || typeof htmlCode !== 'string' || htmlCode.trim().length === 0) {
                     return reply.status(400).send({
@@ -107,28 +99,26 @@ export default async function routes(app: FastifyInstance) {
                     });
                 }
 
-                // Extract links with error handling
-                const links = await extractLinks(htmlCode);
+                // Analyze accessible text
+                const elements = await extractAccessibleText(htmlCode);
                 
                 // Log successful analysis
-                app.log.info(`Successfully analyzed ${links.length} links from HTML code`);
+                app.log.info(`Successfully analyzed accessible text for ${elements.length} elements`);
                 
-                return reply.send({ links });
-                
+                return reply.send({ elements });
+
             } catch (error) {
                 // Enhanced error logging with more context
                 app.log.error({
                     error: error instanceof Error ? error.message : String(error),
                     stack: error instanceof Error ? error.stack : undefined,
-                    contentType: request.headers['content-type'],
-                    bodyLength: typeof request.body === 'string' ? request.body.length : JSON.stringify(request.body || {}).length
-                }, 'Error analyzing links');
+                });
                 
                 // Return appropriate error response
                 const statusCode = error instanceof Error && error.message.includes('too large') ? 413 : 500;
                 const errorMessage = statusCode === 413 
                     ? 'Request too large - HTML code exceeds maximum allowed size'
-                    : 'Internal server error during links analysis';
+                    : 'Internal server error during accessible text analysis';
                 
                 return reply.status(statusCode).send({
                     error: errorMessage,
